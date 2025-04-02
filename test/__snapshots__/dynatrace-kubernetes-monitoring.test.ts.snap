@@ -1,3 +1,50 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`a Dynatrace Kubernetes monitoring instance defaults 1`] = `[]`;
+exports[`a Dynatrace Kubernetes monitoring instance defaults 1`] = `
+[
+  {
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+      "name": "dynatrace",
+    },
+    "spec": {},
+  },
+]
+`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with custom namespace name 1`] = `
+[
+  {
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+      "name": "custom-namespace",
+    },
+    "spec": {},
+  },
+]
+`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with custom namespace props 1`] = `
+[
+  {
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+      "annotations": {
+        "custom-annotation": "value",
+      },
+      "labels": {
+        "custom-label": "value",
+      },
+      "name": "dynatrace",
+    },
+    "spec": {},
+  },
+]
+`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation 1`] = `[]`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation and custom namespace name 1`] = `[]`;

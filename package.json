@@ -9,7 +9,7 @@
     "kubernetes",
     "observability"
   ],
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring.git"
@@ -20,7 +20,7 @@
   "private": true,
   "scripts": {
     "import": "npx cdk8s import",
-    "clean": "npx rimraf lib dist test-reposrts coverage",
+    "clean": "npx rimraf lib dist test-reports coverage .scannerwork",
     "compile": "npx jsii",
     "test": "npx jest",
     "test:update-snapshot": "npx jest --updateSnapshot",
