@@ -1,0 +1,25 @@
+# Generic files and folders to ignore
+.bak/
+.sonar/
+.scannerwork/
+.local/
+.tmp/
+.env
+.env.*
+
+
+# cdk8s files
+dist/
+coverage/
+lib/
+node_modules/
+test-reports/
+*.d.ts
+*.js
+!jest.config.js
+.jsii
+
+
+# Intellij IDEA settings
+.idea/
+*.iml

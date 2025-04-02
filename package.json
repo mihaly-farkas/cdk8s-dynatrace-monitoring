@@ -1,0 +1,95 @@
+{
+  "author": "Mihaly Farkas",
+  "name": "@mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring",
+  "description": "Dynatrace Kubernetes monitoring construct for cdk8s.",
+  "keywords": [
+    "cdk8s",
+    "dynatrace",
+    "monitoring",
+    "kubernetes",
+    "observability"
+  ],
+  "version": "0.1.0-alpha.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring.git"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "import": "npx cdk8s import",
+    "clean": "npx rimraf lib dist test-reposrts coverage",
+    "compile": "npx jsii",
+    "test": "npx jest",
+    "test:update-snapshot": "npx jest --updateSnapshot",
+    "analyze:sonar": "npx sonar",
+    "analyze": "npm run analyze:sonar",
+    "build": "npm run clean && npm run test && npm run compile",
+    "upgrade:npm-packages": "npx npm-check-updates --upgrade --target semver && npm install",
+    "upgrade:cdk8s": "npm install cdk8s@latest cdk8s-cli@latest",
+    "upgrade:cdk8s-next": "npm install cdk8s@next cdk8s-cli@next",
+    "package:js": "npx jsii-pacmak --verbose --target js",
+    "package:java": "npx jsii-pacmak --verbose --target java",
+    "package:python": "npx jsii-pacmak --verbose --target python",
+    "package:dotnet": "npx jsii-pacmak --verbose --target dotnet",
+    "package:go": "npx jsii-pacmak --verbose --target go",
+    "package:all": "npm run package:js && npm run package:java && npm run package:python && npm run package:dotnet && npm run package:go",
+    "package": "npm run package:all"
+  },
+  "engines": {
+    "node": ">= 16.20.0"
+  },
+  "peerDependencies": {
+    "cdk8s-plus-32": "^2.0.8",
+    "constructs": "^10.4.2"
+  },
+  "dependencies": {
+    "cdk8s": "^2.69.59"
+  },
+  "devDependencies": {
+    "@sonar/scan": "^4.3.0",
+    "@types/jest": "^29",
+    "@types/node": "^22",
+    "cdk8s-cli": "^2.200.32",
+    "cdk8s-plus-32": "2.0.8",
+    "constructs": "10.4.2",
+    "jest": "^29",
+    "jest-junit": "^16.0.0",
+    "jsii": "^5.8.3",
+    "jsii-pacmak": "^1.111.0",
+    "npm-check-updates": "^17.1.16",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29",
+    "ts-node": "^10",
+    "typescript": "^5.8.2"
+  },
+  "jsii": {
+    "outdir": "dist",
+    "targets": {
+      "java": {
+        "package": "net.mihaly-farkas.dynatrace-kubernetes-monitoring",
+        "maven": {
+          "groupId": "net.mihaly-farkas",
+          "artifactId": "cdk8s-dynatrace-kubernetes-monitoring"
+        }
+      },
+      "python": {
+        "distName": "cdk8s-dynatrace-kubernetes-monitoring",
+        "module": "cdk8s_dynatrace-kubernetes-monitoring"
+      },
+      "dotnet": {
+        "namespace": "Net.MihalyFarkas.DynatraceKubernetesMonitoring",
+        "packageId": "Net.MihalyFarkas.DynatraceKubernetesMonitoring"
+      },
+      "go": {
+        "moduleName": "github.com/mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring-go"
+      }
+    },
+    "tsc": {
+      "outDir": "lib",
+      "rootDir": "src"
+    }
+  }
+}
