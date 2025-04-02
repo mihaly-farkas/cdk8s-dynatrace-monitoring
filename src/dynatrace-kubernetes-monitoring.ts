@@ -1,12 +1,23 @@
 import { Construct } from 'constructs';
-import { Namespace, Secret } from 'cdk8s-plus-32';
 import { ApiObjectMetadata } from 'cdk8s';
+import { Namespace, Secret } from 'cdk8s-plus-32';
+import { DynaKubeV1Beta3 } from 'cdk8s-imports/dynatrace.com';
+import { DEFAULT_NAMESPACE } from './constants';
 import { DeploymentOption } from './deployment-option';
-import { DynatraceSecret } from './dynatrace-kubernetes-monitoring-constructs';
+import { DynatraceSecret } from './dynatrace-secret';
+import { DynatraceDynaKube } from './dynatrace-dyna-kube';
 
-const DEFAULT_NAMESPACE = 'dynatrace';
 
-type NamespaceProps = Omit<ApiObjectMetadata, 'name' | 'namespace'>;
+type OmittedNamespaceProps = Omit<ApiObjectMetadata, 'name' | 'namespace'>
+
+export interface DynatraceTokens {
+
+  /**
+   * The API token for Dynatrace monitoring.
+   */
+  readonly apiToken: string;
+}
+
 
 /**
  * Properties for configuring Dynatrace Kubernetes monitoring.
@@ -25,14 +36,14 @@ export interface DynatraceKubernetesMonitoringProps {
    *
    * @default - The `dynatrace` namespace will be used.
    */
-  readonly namespace?: string;
+  readonly namespaceName?: string;
 
   /**
    * Properties for the namespace to be created.
    *
    * If {@link skipNamespaceCreation} is set to `true`, this property will be ignored.
    */
-  readonly namespaceProps?: NamespaceProps;
+  readonly namespaceProps?: OmittedNamespaceProps;
 
 
   /**
@@ -45,14 +56,11 @@ export interface DynatraceKubernetesMonitoringProps {
    */
   readonly skipNamespaceCreation?: boolean;
 
-  readonly tokens: {
+  readonly apiUrl: string;
 
-    /**
-     * The API token for Dynatrace monitoring.
-     */
-    readonly apiToken: string;
-  };
+  readonly tokens: DynatraceTokens;
 }
+
 
 /**
  * Sets up Dynatrace monitoring for a Kubernetes cluster.
@@ -61,11 +69,11 @@ export interface DynatraceKubernetesMonitoringProps {
  */
 export class DynatraceKubernetesMonitoring extends Construct {
 
-  public readonly namespace?: Namespace;
-
   public readonly namespaceName: string;
 
   public readonly secret: Secret;
+
+  public readonly dynaKube: DynaKubeV1Beta3;
 
   /**
    * Instantiates a new Dynatrace Kubernetes monitoring instance.
@@ -77,13 +85,15 @@ export class DynatraceKubernetesMonitoring extends Construct {
   constructor(scope: Construct, id: string, props: DynatraceKubernetesMonitoringProps) {
     super(scope, id);
 
-    this.namespaceName = props.namespace ?? DEFAULT_NAMESPACE;
+    this.namespaceName = props.namespaceName ?? DEFAULT_NAMESPACE;
 
-    this.namespace = props.skipNamespaceCreation !== true
-      ? this.createNamespace(this.namespaceName, props.namespaceProps)
-      : undefined;
+    if (props.skipNamespaceCreation !== true) {
+      this.createNamespace(this.namespaceName, props.namespaceProps);
+    }
 
     this.secret = this.createSecret(this.namespaceName, props.tokens.apiToken);
+
+    this.dynaKube = this.createDynaKube(this.namespaceName, props.apiUrl);
   }
 
 
@@ -98,7 +108,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
    * @param namespaceProps The properties for the namespace to be created.
    * @returns The created Namespace.
    */
-  private createNamespace(name: string, namespaceProps?: NamespaceProps): Namespace {
+  private createNamespace(name: string, namespaceProps?: OmittedNamespaceProps): Namespace {
     return new Namespace(this, 'Namespace', {
       metadata: {
         name,
@@ -109,10 +119,22 @@ export class DynatraceKubernetesMonitoring extends Construct {
 
   private createSecret(namespace: string, apiToken: string): Secret {
     return new DynatraceSecret(this, 'Secret', {
-      apiToken,
       metadata: {
         namespace: namespace,
       },
+      apiToken,
+    });
+  }
+
+  private createDynaKube(namespace: string, apiUrl: string): DynaKubeV1Beta3 {
+    return new DynatraceDynaKube(this, 'DynaKube', {
+      metadata: {
+        namespace: namespace,
+        annotations: {
+          'feature.dynatrace.com/k8s-app-enabled': 'true',
+        },
+      },
+      apiUrl,
     });
   }
 }

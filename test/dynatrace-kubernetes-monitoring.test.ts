@@ -1,19 +1,24 @@
 import { Chart, Testing } from 'cdk8s';
 import { DeploymentOption, DynatraceKubernetesMonitoring } from '../src';
 
+const requiredProps = {
+  deploymentOption: DeploymentOption.PLATFORM,
+  apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api2',
+  tokens: {
+    apiToken: '*** API TOKEN ***',
+  },
+};
+
 describe('a Dynatrace Kubernetes monitoring instance', () => {
 
-  test('defaults', () => {
+  test('required only', () => {
     // GIVEN
     const app = Testing.app();
     const chart = new Chart(app, 'test');
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
+      ...requiredProps,
     });
 
     // THEN
@@ -27,11 +32,8 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
-      namespace: 'custom-namespace',
+      ...requiredProps,
+      namespaceName: 'custom-namespace',
     });
 
     // THEN
@@ -45,10 +47,7 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
+      ...requiredProps,
       namespaceProps: {
         annotations: {
           'custom-annotation': 'value',
@@ -70,10 +69,7 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
+      ...requiredProps,
       skipNamespaceCreation: true,
     });
 
@@ -87,11 +83,8 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
-      namespace: 'custom-namespace',
+      ...requiredProps,
+      namespaceName: 'custom-namespace',
       skipNamespaceCreation: true,
     });
 

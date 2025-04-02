@@ -1,11 +1,10 @@
 import { Secret } from 'cdk8s-plus-32';
 import { Construct } from 'constructs';
 import { ResourceProps } from 'cdk8s-plus-32/lib/base';
+import { DEFAULT_SECRET_NAME } from './constants';
 
-const DEFAULT_SECRET_NAME = 'dynakube';
 
 export interface DynatraceSecretProps extends ResourceProps {
-
   readonly apiToken: string;
 }
 

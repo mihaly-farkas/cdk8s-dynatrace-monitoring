@@ -18,6 +18,7 @@ test-reports/
 *.js
 !jest.config.js
 .jsii
+tsconfig.json
 
 
 # Intellij IDEA settings
