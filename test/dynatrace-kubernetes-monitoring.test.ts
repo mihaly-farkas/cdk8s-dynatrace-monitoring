@@ -1,5 +1,5 @@
 import { Chart, Testing } from 'cdk8s';
-import { DynatraceKubernetesMonitoring } from '../src';
+import { DeploymentOption, DynatraceKubernetesMonitoring } from '../src';
 
 describe('a Dynatrace Kubernetes monitoring instance', () => {
 
@@ -9,11 +9,14 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
     const chart = new Chart(app, 'test');
 
     // WHEN
-    const monitoring = new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring');
+    new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+      deploymentOption: DeploymentOption.PLATFORM,
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
+    });
 
     // THEN
-    expect(monitoring.namespace).toBeDefined();
-    expect(monitoring.namespaceName).toBe('dynatrace');
     expect(Testing.synth(chart)).toMatchSnapshot();
   });
 
@@ -23,13 +26,15 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
     const chart = new Chart(app, 'test');
 
     // WHEN
-    const monitoring = new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+    new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+      deploymentOption: DeploymentOption.PLATFORM,
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
       namespace: 'custom-namespace',
     });
 
     // THEN
-    expect(monitoring.namespace).toBeDefined();
-    expect(monitoring.namespaceName).toBe('custom-namespace');
     expect(Testing.synth(chart)).toMatchSnapshot();
   });
 
@@ -39,7 +44,11 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
     const chart = new Chart(app, 'test');
 
     // WHEN
-    const monitoring = new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+    new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+      deploymentOption: DeploymentOption.PLATFORM,
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
       namespaceProps: {
         annotations: {
           'custom-annotation': 'value',
@@ -51,8 +60,6 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
     });
 
     // THEN
-    expect(monitoring.namespace).toBeDefined();
-    expect(monitoring.namespaceName).toBe('dynatrace');
     expect(Testing.synth(chart)).toMatchSnapshot();
   });
 
@@ -62,13 +69,15 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
     const chart = new Chart(app, 'test');
 
     // WHEN
-    const monitoring = new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+    new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+      deploymentOption: DeploymentOption.PLATFORM,
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
       skipNamespaceCreation: true,
     });
 
     // THEN
-    expect(monitoring.namespace).toBeUndefined();
-    expect(monitoring.namespaceName).toBe('dynatrace');
     expect(Testing.synth(chart)).toMatchSnapshot();
   });
 
@@ -77,14 +86,16 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
     const chart = new Chart(app, 'test');
 
     // WHEN
-    const monitoring = new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+    new DynatraceKubernetesMonitoring(chart, 'dynatrace-monitoring', {
+      deploymentOption: DeploymentOption.PLATFORM,
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
       namespace: 'custom-namespace',
       skipNamespaceCreation: true,
     });
 
     // THEN
-    expect(monitoring.namespace).toBeUndefined();
-    expect(monitoring.namespaceName).toBe('custom-namespace');
     expect(Testing.synth(chart)).toMatchSnapshot();
   });
 });

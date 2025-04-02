@@ -1,13 +1,22 @@
 import { Construct } from 'constructs';
-import { Namespace } from 'cdk8s-plus-32';
+import { Namespace, Secret } from 'cdk8s-plus-32';
 import { ApiObjectMetadata } from 'cdk8s';
+import { DeploymentOption } from './deployment-option';
+import { DynatraceSecret } from './dynatrace-kubernetes-monitoring-constructs';
 
 const DEFAULT_NAMESPACE = 'dynatrace';
+
+type NamespaceProps = Omit<ApiObjectMetadata, 'name' | 'namespace'>;
 
 /**
  * Properties for configuring Dynatrace Kubernetes monitoring.
  */
 export interface DynatraceKubernetesMonitoringProps {
+
+  /**
+   * The deployment option for Dynatrace monitoring.
+   */
+  readonly deploymentOption: DeploymentOption;
 
   /**
    * The name of the namespace.
@@ -23,7 +32,7 @@ export interface DynatraceKubernetesMonitoringProps {
    *
    * If {@link skipNamespaceCreation} is set to `true`, this property will be ignored.
    */
-  readonly namespaceProps?: Omit<ApiObjectMetadata, 'name' | 'namespace'>;
+  readonly namespaceProps?: NamespaceProps;
 
 
   /**
@@ -35,6 +44,14 @@ export interface DynatraceKubernetesMonitoringProps {
    * @default false
    */
   readonly skipNamespaceCreation?: boolean;
+
+  readonly tokens: {
+
+    /**
+     * The API token for Dynatrace monitoring.
+     */
+    readonly apiToken: string;
+  };
 }
 
 /**
@@ -46,7 +63,9 @@ export class DynatraceKubernetesMonitoring extends Construct {
 
   public readonly namespace?: Namespace;
 
-  private readonly props: DynatraceKubernetesMonitoringProps;
+  public readonly namespaceName: string;
+
+  public readonly secret: Secret;
 
   /**
    * Instantiates a new Dynatrace Kubernetes monitoring instance.
@@ -55,17 +74,18 @@ export class DynatraceKubernetesMonitoring extends Construct {
    * @param id The id of the construct.
    * @param props The properties of the construct.
    */
-  constructor(scope: Construct, id: string, props: DynatraceKubernetesMonitoringProps = {}) {
+  constructor(scope: Construct, id: string, props: DynatraceKubernetesMonitoringProps) {
     super(scope, id);
 
-    this.props = props;
+    this.namespaceName = props.namespace ?? DEFAULT_NAMESPACE;
 
-    this.namespace = this.createNamespace(props);
+    this.namespace = props.skipNamespaceCreation !== true
+      ? this.createNamespace(this.namespaceName, props.namespaceProps)
+      : undefined;
+
+    this.secret = this.createSecret(this.namespaceName, props.tokens.apiToken);
   }
 
-  public get namespaceName() {
-    return this.namespace?.name ?? this.props.namespace ?? DEFAULT_NAMESPACE;
-  }
 
   /**
    * Creates the namespace for Dynatrace monitoring if required.
@@ -74,21 +94,25 @@ export class DynatraceKubernetesMonitoring extends Construct {
    * (see: {@link DEFAULT_NAMESPACE}).
    * If {@link skipNamespaceCreation} is `true`, no namespace is created.
    *
-   * @param props - The properties of the construct.
-   * @returns The created Namespace, or `undefined` if namespace creation is skipped.
+   * @param name The name of the namespace to create.
+   * @param namespaceProps The properties for the namespace to be created.
+   * @returns The created Namespace.
    */
-  private createNamespace(props: DynatraceKubernetesMonitoringProps): Namespace | undefined {
-    let namespace = undefined;
+  private createNamespace(name: string, namespaceProps?: NamespaceProps): Namespace {
+    return new Namespace(this, 'Namespace', {
+      metadata: {
+        name,
+        ...namespaceProps,
+      },
+    });
+  }
 
-    if (props.skipNamespaceCreation !== true) {
-      namespace = new Namespace(this, 'Namespace', {
-        metadata: {
-          name: this.namespaceName,
-          ...props.namespaceProps,
-        },
-      });
-    }
-
-    return namespace;
+  private createSecret(namespace: string, apiToken: string): Secret {
+    return new DynatraceSecret(this, 'Secret', {
+      apiToken,
+      metadata: {
+        namespace: namespace,
+      },
+    });
   }
 }
