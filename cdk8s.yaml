@@ -1,1 +1,3 @@
 language: typescript
+imports:
+  - https://github.com/Dynatrace/dynatrace-operator/releases/download/v1.4.1/dynatrace-operator-crd.yaml

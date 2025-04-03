@@ -1,3 +1,224 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`a Dynatrace Kubernetes monitoring instance defaults 1`] = `[]`;
+exports[`a Dynatrace Kubernetes monitoring instance required properties only 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with custom namespace name 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with custom namespace props 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      custom-annotation: value
+    labels:
+      custom-label: value
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation and custom namespace name 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation and custom namespace properties 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;

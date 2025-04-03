@@ -9,7 +9,7 @@
     "kubernetes",
     "observability"
   ],
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring.git"
@@ -20,7 +20,7 @@
   "private": true,
   "scripts": {
     "import": "npx cdk8s import",
-    "clean": "npx rimraf lib dist test-reposrts coverage",
+    "clean": "npx rimraf lib dist test-reports coverage .scannerwork",
     "compile": "npx jsii",
     "test": "npx jest",
     "test:update-snapshot": "npx jest --updateSnapshot",
@@ -41,16 +41,22 @@
   "engines": {
     "node": ">= 16.20.0"
   },
+  "bundleDependencies": [
+    "cdk8s-imports"
+  ],
   "peerDependencies": {
     "cdk8s-plus-32": "^2.0.8",
     "constructs": "^10.4.2"
   },
   "dependencies": {
-    "cdk8s": "^2.69.59"
+    "cdk8s": "^2.69.59",
+    "cdk8s-imports": "./imports",
+    "js-yaml": "^4.1.0"
   },
   "devDependencies": {
     "@sonar/scan": "^4.3.0",
     "@types/jest": "^29",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22",
     "cdk8s-cli": "^2.200.32",
     "cdk8s-plus-32": "2.0.8",
