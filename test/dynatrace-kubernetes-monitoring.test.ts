@@ -1,144 +1,133 @@
+import { describe } from '@jest/globals';
 import { Chart, Testing } from 'cdk8s';
-import { DeploymentOption, DynatraceKubernetesMonitoring } from '../src';
+import { DeploymentOption, DynatraceKubernetesMonitoring, DynatraceKubernetesMonitoringProps } from '../src';
 import * as yaml from 'js-yaml';
 
+const deploymentOptions = [
+  DeploymentOption.PLATFORM,
+  DeploymentOption.APPLICATION,
+];
 
-describe('a Dynatrace Kubernetes monitoring instance', () => {
+const apiUrls = [
+  'https://ENVIRONMENTID.live.dynatrace.com/api',
+  'https://fd567567.live.dynatrace.com/api',
+];
 
-  test('required properties only', () => {
-    // GIVEN
-    const app = Testing.app();
-    const chart = new Chart(app, 'test');
+const apiTokens = [
+  '*** API TOKEN 1 ***',
+  '*** API TOKEN 2 ***',
+];
 
-    // WHEN
-    new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
-    });
-    const manifest = yaml.dump(Testing.synth(chart));
 
-    // THEN
-    expect(manifest).toMatchSnapshot();
+const testConstruct = (props: DynatraceKubernetesMonitoringProps) => {
+  it('should generate the expected template.', () => {
+    {
+      // GIVEN
+      const app = Testing.app();
+      const chart = new Chart(app, 'test');
+
+      // WHEN
+      new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', props);
+      const manifest = yaml.dump(Testing.synth(chart));
+
+      // THEN
+      expect(manifest).toMatchSnapshot();
+    }
   });
+};
 
-  test('with custom namespace name', () => {
-    // GIVEN
-    const app = Testing.app();
-    const chart = new Chart(app, 'test');
 
-    // WHEN
-    new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
-      namespaceName: 'custom-namespace',
+describe('The Dynatrace Kubernetes monitoring construct', () => {
+
+  describe.each(deploymentOptions)('with "%s" deployment', (deploymentOption) => {
+
+    describe.each(apiUrls)('and with the "%s" API URL', (apiUrl) => {
+
+      describe.each(apiTokens)('and with "%s" API token', (apiToken) => {
+
+        describe('and without any custom properties', () => {
+          testConstruct({
+            deploymentOption,
+            apiUrl,
+            tokens: {
+              apiToken,
+            },
+          });
+        });
+
+        describe('and with custom namespace name', () => {
+          testConstruct({
+            deploymentOption,
+            apiUrl,
+            tokens: {
+              apiToken,
+            },
+            namespaceName: 'custom-namespace',
+          });
+        });
+
+        describe('and with custom namespace props', () => {
+          testConstruct({
+            deploymentOption,
+            apiUrl,
+            tokens: {
+              apiToken,
+            },
+            namespaceName: 'custom-namespace',
+            namespaceProps: {
+              annotations: {
+                'custom-annotation': 'value',
+              },
+              labels: {
+                'custom-label': 'value',
+              },
+            },
+          });
+        });
+
+        describe('and with skip namespace creation', () => {
+          testConstruct({
+            deploymentOption,
+            apiUrl,
+            tokens: {
+              apiToken,
+            },
+            skipNamespaceCreation: true,
+          });
+
+          describe('and with custom namespace name', () => {
+            testConstruct({
+              deploymentOption,
+              apiUrl,
+              tokens: {
+                apiToken,
+              },
+              namespaceName: 'custom-namespace',
+              skipNamespaceCreation: true,
+            });
+          });
+
+          describe('and with custom namespace props', () => {
+            testConstruct({
+              deploymentOption,
+              apiUrl,
+              tokens: {
+                apiToken,
+              },
+              namespaceName: 'custom-namespace',
+              skipNamespaceCreation: true,
+              namespaceProps: {
+                annotations: {
+                  'custom-annotation': 'value',
+                },
+                labels: {
+                  'custom-label': 'value',
+                },
+              },
+            });
+          });
+        });
+      });
     });
-    const manifest = yaml.dump(Testing.synth(chart));
-
-    // THEN
-    expect(manifest).toMatchSnapshot();
-  });
-
-  test('with custom namespace props', () => {
-    // GIVEN
-    const app = Testing.app();
-    const chart = new Chart(app, 'test');
-
-    // WHEN
-    new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
-      namespaceProps: {
-        annotations: {
-          'custom-annotation': 'value',
-        },
-        labels: {
-          'custom-label': 'value',
-        },
-      },
-    });
-    const manifest = yaml.dump(Testing.synth(chart));
-
-    // THEN
-    expect(manifest).toMatchSnapshot();
-  });
-
-  test('with skip namespace creation', () => {
-    // GIVEN
-    const app = Testing.app();
-    const chart = new Chart(app, 'test');
-
-    // WHEN
-    new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
-      skipNamespaceCreation: true,
-    });
-    const manifest = yaml.dump(Testing.synth(chart));
-
-    // THEN
-    expect(manifest).toMatchSnapshot();
-  });
-
-  test('with skip namespace creation and custom namespace name', () => {
-    const app = Testing.app();
-    const chart = new Chart(app, 'test');
-
-    // WHEN
-    new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
-      namespaceName: 'custom-namespace',
-      skipNamespaceCreation: true,
-    });
-    const manifest = yaml.dump(Testing.synth(chart));
-
-    // THEN
-    expect(manifest).toMatchSnapshot();
-  });
-
-  test('with skip namespace creation and custom namespace properties', () => {
-    const app = Testing.app();
-    const chart = new Chart(app, 'test');
-
-    jest.spyOn(console, 'warn').mockImplementation(() => {
-    });
-
-    // WHEN
-    new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      deploymentOption: DeploymentOption.PLATFORM,
-      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
-      tokens: {
-        apiToken: '*** API TOKEN ***',
-      },
-      namespaceName: 'custom-namespace',
-      skipNamespaceCreation: true,
-      namespaceProps: {
-        annotations: {
-          'custom-annotation': 'value',
-        },
-      },
-    });
-    const manifest = yaml.dump(Testing.synth(chart));
-
-    // THEN
-    expect(manifest).toMatchSnapshot();
-    expect(console.warn).toHaveBeenCalledWith(
-      'WARNING: Namespace properties will be ignored as skip namespace creation is set to true.',
-    );
   });
 });

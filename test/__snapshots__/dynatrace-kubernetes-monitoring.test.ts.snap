@@ -1,45 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`a Dynatrace Kubernetes monitoring instance required properties only 1`] = `
-"- apiVersion: v1
-  kind: Namespace
-  metadata:
-    name: dynatrace
-  spec: {}
-- apiVersion: v1
-  kind: Secret
-  metadata:
-    name: dynakube
-    namespace: dynatrace
-  immutable: false
-  stringData:
-    apiToken: '*** API TOKEN ***'
-  type: Opaque
-- apiVersion: dynatrace.com/v1beta3
-  kind: DynaKube
-  metadata:
-    annotations:
-      feature.dynatrace.com/k8s-app-enabled: 'true'
-    name: dynakube
-    namespace: dynatrace
-  spec:
-    activeGate:
-      capabilities:
-        - kubernetes-monitoring
-      resources:
-        limits:
-          cpu: 1000m
-          memory: 1.5Gi
-        requests:
-          cpu: 500m
-          memory: 512Mi
-    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
-    metadataEnrichment:
-      enabled: true
-"
-`;
-
-exports[`a Dynatrace Kubernetes monitoring instance with custom namespace name 1`] = `
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with custom namespace name should generate the expected template. 1`] = `
 "- apiVersion: v1
   kind: Namespace
   metadata:
@@ -52,12 +13,13 @@ exports[`a Dynatrace Kubernetes monitoring instance with custom namespace name 1
     namespace: custom-namespace
   immutable: false
   stringData:
-    apiToken: '*** API TOKEN ***'
+    apiToken: '*** API TOKEN 1 ***'
   type: Opaque
 - apiVersion: dynatrace.com/v1beta3
   kind: DynaKube
   metadata:
     annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
       feature.dynatrace.com/k8s-app-enabled: 'true'
     name: dynakube
     namespace: custom-namespace
@@ -65,6 +27,7 @@ exports[`a Dynatrace Kubernetes monitoring instance with custom namespace name 1
     activeGate:
       capabilities:
         - kubernetes-monitoring
+        - routing
       resources:
         limits:
           cpu: 1000m
@@ -75,10 +38,12 @@ exports[`a Dynatrace Kubernetes monitoring instance with custom namespace name 1
     apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
     metadataEnrichment:
       enabled: true
+    oneAgent:
+      applicationMonitoring: {}
 "
 `;
 
-exports[`a Dynatrace Kubernetes monitoring instance with custom namespace props 1`] = `
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with custom namespace props should generate the expected template. 1`] = `
 "- apiVersion: v1
   kind: Namespace
   metadata:
@@ -86,6 +51,163 @@ exports[`a Dynatrace Kubernetes monitoring instance with custom namespace props 
       custom-annotation: value
     labels:
       custom-label: value
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and without any custom properties should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
     name: dynatrace
   spec: {}
 - apiVersion: v1
@@ -95,7 +217,936 @@ exports[`a Dynatrace Kubernetes monitoring instance with custom namespace props 
     namespace: dynatrace
   immutable: false
   stringData:
-    apiToken: '*** API TOKEN ***'
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      custom-annotation: value
+    labels:
+      custom-label: value
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and without any custom properties should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      custom-annotation: value
+    labels:
+      custom-label: value
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and without any custom properties should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      custom-annotation: value
+    labels:
+      custom-label: value
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "application" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and without any custom properties should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/injection-readonly-volume: 'true'
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+        - routing
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+    oneAgent:
+      applicationMonitoring: {}
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      custom-annotation: value
+    labels:
+      custom-label: value
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
   type: Opaque
 - apiVersion: dynatrace.com/v1beta3
   kind: DynaKube
@@ -121,15 +1172,20 @@ exports[`a Dynatrace Kubernetes monitoring instance with custom namespace props 
 "
 `;
 
-exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation 1`] = `
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and without any custom properties should generate the expected template. 1`] = `
 "- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
   kind: Secret
   metadata:
     name: dynakube
     namespace: dynatrace
   immutable: false
   stringData:
-    apiToken: '*** API TOKEN ***'
+    apiToken: '*** API TOKEN 1 ***'
   type: Opaque
 - apiVersion: dynatrace.com/v1beta3
   kind: DynaKube
@@ -155,15 +1211,20 @@ exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation
 "
 `;
 
-exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation and custom namespace name 1`] = `
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with custom namespace name should generate the expected template. 1`] = `
 "- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
   kind: Secret
   metadata:
     name: dynakube
     namespace: custom-namespace
   immutable: false
   stringData:
-    apiToken: '*** API TOKEN ***'
+    apiToken: '*** API TOKEN 2 ***'
   type: Opaque
 - apiVersion: dynatrace.com/v1beta3
   kind: DynaKube
@@ -189,15 +1250,24 @@ exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation
 "
 `;
 
-exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation and custom namespace properties 1`] = `
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with custom namespace props should generate the expected template. 1`] = `
 "- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      custom-annotation: value
+    labels:
+      custom-label: value
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
   kind: Secret
   metadata:
     name: dynakube
     namespace: custom-namespace
   immutable: false
   stringData:
-    apiToken: '*** API TOKEN ***'
+    apiToken: '*** API TOKEN 2 ***'
   type: Opaque
 - apiVersion: dynatrace.com/v1beta3
   kind: DynaKube
@@ -218,6 +1288,593 @@ exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation
           cpu: 500m
           memory: 512Mi
     apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://ENVIRONMENTID.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and without any custom properties should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      custom-annotation: value
+    labels:
+      custom-label: value
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and with skip namespace creation should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 1 ***" API token and without any custom properties should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 1 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    annotations:
+      custom-annotation: value
+    labels:
+      custom-label: value
+    name: custom-namespace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation and with custom namespace name should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation and with custom namespace props should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: custom-namespace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: custom-namespace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and with skip namespace creation should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
+    metadataEnrichment:
+      enabled: true
+"
+`;
+
+exports[`The Dynatrace Kubernetes monitoring construct with "platform" deployment and with the "https://fd567567.live.dynatrace.com/api" API URL and with "*** API TOKEN 2 ***" API token and without any custom properties should generate the expected template. 1`] = `
+"- apiVersion: v1
+  kind: Namespace
+  metadata:
+    name: dynatrace
+  spec: {}
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: dynakube
+    namespace: dynatrace
+  immutable: false
+  stringData:
+    apiToken: '*** API TOKEN 2 ***'
+  type: Opaque
+- apiVersion: dynatrace.com/v1beta3
+  kind: DynaKube
+  metadata:
+    annotations:
+      feature.dynatrace.com/k8s-app-enabled: 'true'
+    name: dynakube
+    namespace: dynatrace
+  spec:
+    activeGate:
+      capabilities:
+        - kubernetes-monitoring
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 1.5Gi
+        requests:
+          cpu: 500m
+          memory: 512Mi
+    apiUrl: https://fd567567.live.dynatrace.com/api
     metadataEnrichment:
       enabled: true
 "

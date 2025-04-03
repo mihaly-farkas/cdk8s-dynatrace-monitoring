@@ -4,12 +4,17 @@
  * The options have different capabilities, licensing, pricing, etc.
  *
  * For more information, see the Dynatrace documentation:
- * [Kubernetes Deployment](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment)
+ * [Observability options](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment#observability-options)
  */
 export enum DeploymentOption {
 
   /**
    * Kubernetes platform monitoring
    */
-  PLATFORM,
+  PLATFORM = 'platform',
+
+  /**
+   * Kubernetes platform monitoring + Application observability
+   */
+  APPLICATION = 'application',
 }

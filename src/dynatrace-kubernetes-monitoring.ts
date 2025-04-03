@@ -102,7 +102,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
 
     this.secret = this.createSecret(this.namespaceName, props.tokens.apiToken);
 
-    this.dynaKube = this.createDynaKube(this.namespaceName, props.apiUrl);
+    this.dynaKube = this.createDynaKube(props.deploymentOption, this.namespaceName, props.apiUrl);
   }
 
   private getNamespaceName(requestedNamespaceName?: string): string {
@@ -131,13 +131,16 @@ export class DynatraceKubernetesMonitoring extends Construct {
     });
   }
 
-  private createDynaKube(namespace: string, apiUrl: string): DynaKubeV1Beta3 {
+  private createDynaKube(deploymentOption: DeploymentOption, namespace: string, apiUrl: string): DynaKubeV1Beta3 {
     return new DynaKubeV1Beta3(this, 'DynaKube', {
       metadata: {
         name: DEFAULT_DYNA_KUBE_NAME,
         namespace: namespace,
         annotations: {
           'feature.dynatrace.com/k8s-app-enabled': 'true',
+          ...(deploymentOption === DeploymentOption.APPLICATION ? {
+            'feature.dynatrace.com/injection-readonly-volume': 'true',
+          } : {}),
         },
       },
       spec: {
@@ -148,6 +151,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
         activeGate: {
           capabilities: [
             'kubernetes-monitoring',
+            ...(deploymentOption === DeploymentOption.APPLICATION ? ['routing'] : []),
           ],
           resources: {
             requests: {
@@ -160,6 +164,11 @@ export class DynatraceKubernetesMonitoring extends Construct {
             },
           },
         },
+        ...(deploymentOption === DeploymentOption.APPLICATION ? {
+          oneAgent: {
+            applicationMonitoring: {},
+          },
+        } : {}),
       },
     });
   }
