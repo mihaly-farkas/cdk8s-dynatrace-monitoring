@@ -9,9 +9,6 @@ const platformMonitoringReferenceYaml = yaml.load(
   fs.readFileSync(`${fixtures_dir}/platform-monitoring.yml`, 'utf8'),
 );
 
-// Indexes of the manifests in the synthesized output
-const DYNA_KUBE = 2;
-
 const requiredProps = {
   deploymentOption: DeploymentOption.PLATFORM,
   apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
@@ -34,7 +31,7 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
     const manifest = Testing.synth(chart);
 
     // THEN
-    const dynakubeManifest = manifest[DYNA_KUBE];
+    const dynakubeManifest = manifest[2];
     expect(dynakubeManifest).toStrictEqual(platformMonitoringReferenceYaml);
     expect(manifest).toMatchSnapshot();
   });
@@ -75,7 +72,7 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
     const manifest = Testing.synth(chart);
 
     // THEN
-    const dynakubeManifest = manifest[DYNA_KUBE];
+    const dynakubeManifest = manifest[2];
     expect(dynakubeManifest).toStrictEqual(platformMonitoringReferenceYaml);
     expect(manifest).toMatchSnapshot();
   });
