@@ -49,7 +49,7 @@ exports[`a Dynatrace Kubernetes monitoring instance required only 1`] = `
           },
         },
       },
-      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api2",
+      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api",
       "metadataEnrichment": {
         "enabled": true,
       },
@@ -107,7 +107,7 @@ exports[`a Dynatrace Kubernetes monitoring instance with custom namespace name 1
           },
         },
       },
-      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api2",
+      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api",
       "metadataEnrichment": {
         "enabled": true,
       },
@@ -171,7 +171,7 @@ exports[`a Dynatrace Kubernetes monitoring instance with custom namespace props 
           },
         },
       },
-      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api2",
+      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api",
       "metadataEnrichment": {
         "enabled": true,
       },
@@ -221,7 +221,7 @@ exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation
           },
         },
       },
-      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api2",
+      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api",
       "metadataEnrichment": {
         "enabled": true,
       },
@@ -271,7 +271,7 @@ exports[`a Dynatrace Kubernetes monitoring instance with skip namespace creation
           },
         },
       },
-      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api2",
+      "apiUrl": "https://ENVIRONMENTID.live.dynatrace.com/api",
       "metadataEnrichment": {
         "enabled": true,
       },

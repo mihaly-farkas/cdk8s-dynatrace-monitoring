@@ -1,11 +1,9 @@
 import { Construct } from 'constructs';
 import { ApiObjectMetadata } from 'cdk8s';
 import { Namespace, Secret } from 'cdk8s-plus-32';
-import { DynaKubeV1Beta3 } from 'cdk8s-imports/dynatrace.com';
-import { DEFAULT_NAMESPACE } from './constants';
+import { DynaKubeV1Beta3, DynaKubeV1Beta3SpecActiveGateResourcesRequests } from 'cdk8s-imports/dynatrace.com';
+import { DEFAULT_DYNA_KUBE_NAME, DEFAULT_NAMESPACE, DEFAULT_SECRET_NAME } from './constants';
 import { DeploymentOption } from './deployment-option';
-import { DynatraceSecret } from './dynatrace-secret';
-import { DynatraceDynaKube } from './dynatrace-dyna-kube';
 
 
 type OmittedNamespaceProps = Omit<ApiObjectMetadata, 'name' | 'namespace'>
@@ -85,6 +83,12 @@ export class DynatraceKubernetesMonitoring extends Construct {
   constructor(scope: Construct, id: string, props: DynatraceKubernetesMonitoringProps) {
     super(scope, id);
 
+    switch (props.deploymentOption) {
+      case DeploymentOption.APPLICATION:
+      case DeploymentOption.FULL_STACK:
+        throw new Error('Not Implemented');
+    }
+
     this.namespaceName = props.namespaceName ?? DEFAULT_NAMESPACE;
 
     if (props.skipNamespaceCreation !== true) {
@@ -118,23 +122,48 @@ export class DynatraceKubernetesMonitoring extends Construct {
   }
 
   private createSecret(namespace: string, apiToken: string): Secret {
-    return new DynatraceSecret(this, 'Secret', {
+    return new Secret(this, 'Secret', {
       metadata: {
+        name: DEFAULT_SECRET_NAME,
         namespace: namespace,
       },
-      apiToken,
+      type: 'Opaque',
+      stringData: {
+        apiToken: apiToken,
+      },
     });
   }
 
   private createDynaKube(namespace: string, apiUrl: string): DynaKubeV1Beta3 {
-    return new DynatraceDynaKube(this, 'DynaKube', {
+    return new DynaKubeV1Beta3(this, 'DynaKube', {
       metadata: {
+        name: DEFAULT_DYNA_KUBE_NAME,
         namespace: namespace,
         annotations: {
           'feature.dynatrace.com/k8s-app-enabled': 'true',
         },
       },
-      apiUrl,
+      spec: {
+        apiUrl,
+        metadataEnrichment: {
+          enabled: true,
+        },
+        activeGate: {
+          capabilities: [
+            'kubernetes-monitoring',
+          ],
+          resources: {
+            requests: {
+              cpu: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString('500m'),
+              memory: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString('512Mi'),
+            },
+            limits: {
+              cpu: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString('1000m'),
+              memory: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString('1.5Gi'),
+            },
+          },
+        },
+      },
     });
   }
 }
