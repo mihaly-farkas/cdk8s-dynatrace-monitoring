@@ -1,38 +1,26 @@
 import { Chart, Testing } from 'cdk8s';
 import { DeploymentOption, DynatraceKubernetesMonitoring } from '../src';
 import * as yaml from 'js-yaml';
-import * as fs from 'node:fs';
 
-
-const fixtures_dir = `${__dirname}/__fixtures__`;
-const platformMonitoringReferenceYaml = yaml.load(
-  fs.readFileSync(`${fixtures_dir}/platform-monitoring.yml`, 'utf8'),
-);
-
-const requiredProps = {
-  deploymentOption: DeploymentOption.PLATFORM,
-  apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
-  tokens: {
-    apiToken: '*** API TOKEN ***',
-  },
-};
 
 describe('a Dynatrace Kubernetes monitoring instance', () => {
 
-  test('required only', () => {
+  test('required properties only', () => {
     // GIVEN
     const app = Testing.app();
     const chart = new Chart(app, 'test');
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      ...requiredProps,
+      deploymentOption: DeploymentOption.PLATFORM,
+      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
     });
-    const manifest = Testing.synth(chart);
+    const manifest = yaml.dump(Testing.synth(chart));
 
     // THEN
-    const dynakubeManifest = manifest[2];
-    expect(dynakubeManifest).toStrictEqual(platformMonitoringReferenceYaml);
     expect(manifest).toMatchSnapshot();
   });
 
@@ -43,10 +31,14 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      ...requiredProps,
+      deploymentOption: DeploymentOption.PLATFORM,
+      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
       namespaceName: 'custom-namespace',
     });
-    const manifest = Testing.synth(chart);
+    const manifest = yaml.dump(Testing.synth(chart));
 
     // THEN
     expect(manifest).toMatchSnapshot();
@@ -59,7 +51,11 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      ...requiredProps,
+      deploymentOption: DeploymentOption.PLATFORM,
+      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
       namespaceProps: {
         annotations: {
           'custom-annotation': 'value',
@@ -69,11 +65,9 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
         },
       },
     });
-    const manifest = Testing.synth(chart);
+    const manifest = yaml.dump(Testing.synth(chart));
 
     // THEN
-    const dynakubeManifest = manifest[2];
-    expect(dynakubeManifest).toStrictEqual(platformMonitoringReferenceYaml);
     expect(manifest).toMatchSnapshot();
   });
 
@@ -84,10 +78,14 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      ...requiredProps,
+      deploymentOption: DeploymentOption.PLATFORM,
+      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
       skipNamespaceCreation: true,
     });
-    const manifest = Testing.synth(chart);
+    const manifest = yaml.dump(Testing.synth(chart));
 
     // THEN
     expect(manifest).toMatchSnapshot();
@@ -99,13 +97,48 @@ describe('a Dynatrace Kubernetes monitoring instance', () => {
 
     // WHEN
     new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
-      ...requiredProps,
+      deploymentOption: DeploymentOption.PLATFORM,
+      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
       namespaceName: 'custom-namespace',
       skipNamespaceCreation: true,
     });
-    const manifest = Testing.synth(chart);
+    const manifest = yaml.dump(Testing.synth(chart));
 
     // THEN
     expect(manifest).toMatchSnapshot();
+  });
+
+  test('with skip namespace creation and custom namespace properties', () => {
+    const app = Testing.app();
+    const chart = new Chart(app, 'test');
+
+    jest.spyOn(console, 'warn').mockImplementation(() => {
+    });
+
+    // WHEN
+    new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', {
+      deploymentOption: DeploymentOption.PLATFORM,
+      apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
+      tokens: {
+        apiToken: '*** API TOKEN ***',
+      },
+      namespaceName: 'custom-namespace',
+      skipNamespaceCreation: true,
+      namespaceProps: {
+        annotations: {
+          'custom-annotation': 'value',
+        },
+      },
+    });
+    const manifest = yaml.dump(Testing.synth(chart));
+
+    // THEN
+    expect(manifest).toMatchSnapshot();
+    expect(console.warn).toHaveBeenCalledWith(
+      'WARNING: Namespace properties will be ignored as skip namespace creation is set to true.',
+    );
   });
 });

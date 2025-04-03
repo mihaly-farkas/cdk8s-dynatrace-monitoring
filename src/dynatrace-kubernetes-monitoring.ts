@@ -6,6 +6,15 @@ import { DEFAULT_DYNA_KUBE_NAME, DEFAULT_NAMESPACE, DEFAULT_SECRET_NAME } from '
 import { DeploymentOption } from './deployment-option';
 
 
+/**
+ * Namespace properties without the `name` and `namespace` fields.
+ *
+ * In this construct, we use a separate {@link DynatraceKubernetesMonitoringProps#namespaceName} property
+ * for setting the namespace name. To ensure clarity and avoid handling precedence rules or a property combination mess,
+ * we omit the `name` field.
+ *
+ * We also omit the `namespace` field, as it is not applicable in this context.
+ */
 type OmittedNamespaceProps = Omit<ApiObjectMetadata, 'name' | 'namespace'>
 
 export interface DynatraceTokens {
@@ -83,16 +92,12 @@ export class DynatraceKubernetesMonitoring extends Construct {
   constructor(scope: Construct, id: string, props: DynatraceKubernetesMonitoringProps) {
     super(scope, id);
 
-    switch (props.deploymentOption) {
-      case DeploymentOption.APPLICATION:
-      case DeploymentOption.FULL_STACK:
-        throw new Error('Not Implemented');
-    }
-
-    this.namespaceName = props.namespaceName ?? DEFAULT_NAMESPACE;
+    this.namespaceName = this.getNamespaceName(props.namespaceName);
 
     if (props.skipNamespaceCreation !== true) {
       this.createNamespace(this.namespaceName, props.namespaceProps);
+    } else if (props.namespaceProps) {
+      console.warn('WARNING: Namespace properties will be ignored as skip namespace creation is set to true.');
     }
 
     this.secret = this.createSecret(this.namespaceName, props.tokens.apiToken);
@@ -100,18 +105,10 @@ export class DynatraceKubernetesMonitoring extends Construct {
     this.dynaKube = this.createDynaKube(this.namespaceName, props.apiUrl);
   }
 
+  private getNamespaceName(requestedNamespaceName?: string): string {
+    return requestedNamespaceName ?? DEFAULT_NAMESPACE;
+  }
 
-  /**
-   * Creates the namespace for Dynatrace monitoring if required.
-   *
-   * If {@link skipNamespaceCreation} is set to `false` or not provided, the namespace is created with the default name
-   * (see: {@link DEFAULT_NAMESPACE}).
-   * If {@link skipNamespaceCreation} is `true`, no namespace is created.
-   *
-   * @param name The name of the namespace to create.
-   * @param namespaceProps The properties for the namespace to be created.
-   * @returns The created Namespace.
-   */
   private createNamespace(name: string, namespaceProps?: OmittedNamespaceProps): Namespace {
     return new Namespace(this, 'Namespace', {
       metadata: {

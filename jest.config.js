@@ -20,6 +20,7 @@ module.exports = {
   coverageDirectory: 'coverage',
   coveragePathIgnorePatterns: [
     '/node_modules/',
+    '/imports/',
   ],
   testPathIgnorePatterns: [
     '/node_modules/',
@@ -37,4 +38,5 @@ module.exports = {
     ],
   ],
   preset: 'ts-jest',
+  resetMocks: true,
 };
