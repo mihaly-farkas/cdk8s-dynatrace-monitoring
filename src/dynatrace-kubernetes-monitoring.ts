@@ -23,6 +23,8 @@ export interface DynatraceTokens {
    * The API token for Dynatrace monitoring.
    */
   readonly apiToken: string;
+
+  readonly dataIngestToken?: string;
 }
 
 
@@ -97,10 +99,10 @@ export class DynatraceKubernetesMonitoring extends Construct {
     if (props.skipNamespaceCreation !== true) {
       this.createNamespace(this.namespaceName, props.namespaceProps);
     } else if (props.namespaceProps) {
-      console.warn('WARNING: Namespace properties will be ignored as skip namespace creation is set to true.');
+      console.warn('WARNING: Namespace creation is skipped. Custom namespace properties will not be applied.');
     }
 
-    this.secret = this.createSecret(this.namespaceName, props.tokens.apiToken);
+    this.secret = this.createSecret(props.deploymentOption, this.namespaceName, props.tokens.apiToken, props.tokens.dataIngestToken);
 
     this.dynaKube = this.createDynaKube(props.deploymentOption, this.namespaceName, props.apiUrl);
   }
@@ -118,7 +120,11 @@ export class DynatraceKubernetesMonitoring extends Construct {
     });
   }
 
-  private createSecret(namespace: string, apiToken: string): Secret {
+  private createSecret(deploymentOption: DeploymentOption, namespace: string, apiToken: string, dataIngestToken?: string): Secret {
+    if (deploymentOption === DeploymentOption.PLATFORM && dataIngestToken) {
+      console.warn('WARNING: Data ingest token is not supported for platform monitoring. It will be ignored.');
+    }
+
     return new Secret(this, 'Secret', {
       metadata: {
         name: DEFAULT_SECRET_NAME,
@@ -127,6 +133,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
       type: 'Opaque',
       stringData: {
         apiToken: apiToken,
+        ...(deploymentOption !== DeploymentOption.PLATFORM ? {dataIngestToken: dataIngestToken} : {}),
       },
     });
   }
@@ -138,7 +145,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
         namespace: namespace,
         annotations: {
           'feature.dynatrace.com/k8s-app-enabled': 'true',
-          ...(deploymentOption === DeploymentOption.APPLICATION ? {
+          ...(deploymentOption !== DeploymentOption.PLATFORM ? {
             'feature.dynatrace.com/injection-readonly-volume': 'true',
           } : {}),
         },
@@ -151,7 +158,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
         activeGate: {
           capabilities: [
             'kubernetes-monitoring',
-            ...(deploymentOption === DeploymentOption.APPLICATION ? ['routing'] : []),
+            ...(deploymentOption !== DeploymentOption.PLATFORM ? ['routing'] : []),
           ],
           resources: {
             requests: {
@@ -169,6 +176,25 @@ export class DynatraceKubernetesMonitoring extends Construct {
             applicationMonitoring: {},
           },
         } : {}),
+        ...(deploymentOption === DeploymentOption.FULL_STACK ? {
+          oneAgent: {
+            cloudNativeFullStack: {
+              tolerations: [
+                {
+                  key: 'node-role.kubernetes.io/master',
+                  operator: 'Exists',
+                  effect: 'NoSchedule',
+                },
+                {
+                  key: 'node-role.kubernetes.io/control-plane',
+                  operator: 'Exists',
+                  effect: 'NoSchedule',
+                },
+              ],
+            },
+          },
+        } : {}),
+
       },
     });
   }

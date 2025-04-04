@@ -9,7 +9,7 @@
     "kubernetes",
     "observability"
   ],
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "repository": {
     "type": "git",
     "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring.git"
@@ -62,6 +62,7 @@
     "cdk8s-plus-32": "2.0.8",
     "constructs": "10.4.2",
     "jest": "^29",
+    "jest-file-snapshot": "^0.7.0",
     "jest-junit": "^16.0.0",
     "jsii": "^5.8.3",
     "jsii-pacmak": "^1.111.0",
