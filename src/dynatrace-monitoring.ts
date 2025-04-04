@@ -124,17 +124,57 @@ export interface DynatraceContainerResources {
 }
 
 /**
+ * Represents optional ActiveGate capabilities that can be enabled for Dynatrace monitoring.
+ *
+ * These capabilities enhance monitoring functionality by enabling specific ActiveGate features.
+ *
+ * Note that core capabilities like `kubernetes-monitoring` and `routing` are added automatically
+ * by the construct based on the selected deployment option.
+ */
+export enum DynatraceCapability {
+
+  /**
+   * Enables the metrics ingest endpoint on ActiveGate and configures pods to redirect metrics to it.
+   *
+   * This capability is required for collecting Prometheus metrics or custom metrics from pods
+   * outside the Dynatrace namespace.
+   */
+  METRICS_INGEST = 'metrics-ingest',
+
+  /**
+   * Enables the Dynatrace API endpoint on ActiveGate, allowing Kubernetes pods to interact with the Dynatrace API.
+   *
+   * This is required for scenarios where agents or services within the cluster need to push
+   * or query data via the Dynatrace API through the ActiveGate.
+   */
+  DYNATRACE_API = 'dynatrace-api',
+}
+
+/**
  * Properties related to ActiveGate configuration in Dynatrace.
  */
 export interface ActiveGateProps {
 
   /**
+   * Optional list of additional ActiveGate capabilities to enable.
+   *
+   * These capabilities extend the functionality of the ActiveGate component.
+   * The construct automatically includes essential capabilities like `kubernetes-monitoring`
+   * and `routing` based on the selected deployment option, so they do not need to be specified here.
+   *
+   * Use this property to explicitly enable additional features such as `metrics-ingest` or `dynatrace-api`.
+   */
+  capabilities?: DynatraceCapability[];
+
+  /**
    * CPU and memory resource configurations for the ActiveGate pod(s).
    *
-   * Consumption of the ActiveGate heavily depends on the workload to monitor.
-   * The values should be adjusted according to the expected workload.
+   * Resource limits and requests help control how much compute and memory is allocated to ActiveGate.
+   * Adjust these values based on your expected load and cluster resource availability.
+   *
+   * @default Uses predefined default values suitable for most workloads.
    */
-  resources: DynatraceContainerResources;
+  resources?: DynatraceContainerResources;
 }
 
 /**
@@ -349,10 +389,11 @@ export class DynatraceMonitoring extends Construct {
           enabled: true,
         },
         activeGate: {
-          capabilities: [
+          capabilities: Array.from(new Set([
             'kubernetes-monitoring',
             ...(this.isAdvancedDeployment() && ['routing'] || []),
-          ],
+            ...(this.props.activeGate?.capabilities?.map(enumValue => enumValue.toString()) || []),
+          ])),
           resources: {
             requests: {
               ...this.parseResourceRequest('cpu', activeGateCpu?.request, DEFAULT_ACTIVE_GATE_CPU_REQUEST),
