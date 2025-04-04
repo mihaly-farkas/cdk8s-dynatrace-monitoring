@@ -1,9 +1,10 @@
 import { Construct } from 'constructs';
-import { ApiObjectMetadata } from 'cdk8s';
+import { ApiObjectMetadata, Size } from 'cdk8s';
 import { Namespace, Secret } from 'cdk8s-plus-32';
 import { DynaKubeV1Beta3, DynaKubeV1Beta3SpecActiveGateResourcesRequests } from 'cdk8s-imports/dynatrace.com';
 import { DEFAULT_DYNA_KUBE_NAME, DEFAULT_NAMESPACE, DEFAULT_SECRET_NAME } from './constants';
 import { DeploymentOption } from './deployment-option';
+import { Cpu } from 'cdk8s-plus-32/lib/container';
 
 
 /**
@@ -27,6 +28,34 @@ export interface DynatraceTokens {
   readonly dataIngestToken?: string;
 }
 
+/**
+ * CPU request and limit
+ */
+export interface DynatraceCpuResources {
+  readonly request?: Cpu | string | number;
+  readonly limit?: Cpu | string | number;
+}
+
+/**
+ * Memory request and limit
+ */
+export interface DynatraceMemoryResources {
+  readonly request?: Size | string | number;
+  readonly limit?: Size | string | number;
+}
+
+/**
+ * Compute resources.
+ */
+export interface DynatraceContainerResources {
+  readonly cpu?: DynatraceCpuResources;
+  readonly memory?: DynatraceMemoryResources;
+}
+
+export interface ActiveGateProps {
+
+  resources: DynatraceContainerResources;
+}
 
 /**
  * Properties for configuring Dynatrace Kubernetes monitoring.
@@ -68,6 +97,8 @@ export interface DynatraceKubernetesMonitoringProps {
   readonly apiUrl: string;
 
   readonly tokens: DynatraceTokens;
+
+  readonly activeGate?: ActiveGateProps;
 }
 
 
@@ -104,7 +135,12 @@ export class DynatraceKubernetesMonitoring extends Construct {
 
     this.secret = this.createSecret(props.deploymentOption, this.namespaceName, props.tokens.apiToken, props.tokens.dataIngestToken);
 
-    this.dynaKube = this.createDynaKube(props.deploymentOption, this.namespaceName, props.apiUrl);
+    this.dynaKube = this.createDynaKube(
+      props.deploymentOption,
+      this.namespaceName,
+      props.apiUrl,
+      props.activeGate,
+    );
   }
 
   private getNamespaceName(requestedNamespaceName?: string): string {
@@ -138,7 +174,12 @@ export class DynatraceKubernetesMonitoring extends Construct {
     });
   }
 
-  private createDynaKube(deploymentOption: DeploymentOption, namespace: string, apiUrl: string): DynaKubeV1Beta3 {
+  private createDynaKube(
+    deploymentOption: DeploymentOption,
+    namespace: string,
+    apiUrl: string,
+    activeGateProps?: ActiveGateProps,
+  ): DynaKubeV1Beta3 {
     return new DynaKubeV1Beta3(this, 'DynaKube', {
       metadata: {
         name: DEFAULT_DYNA_KUBE_NAME,
@@ -162,12 +203,32 @@ export class DynatraceKubernetesMonitoring extends Construct {
           ],
           resources: {
             requests: {
-              cpu: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString('500m'),
-              memory: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString('512Mi'),
+              cpu: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(
+                this.cpuAsString({
+                  cpu: activeGateProps?.resources?.cpu?.request,
+                  defaultValue: '500m',
+                }),
+              ),
+              memory: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(
+                this.sizeAsString({
+                  size: activeGateProps?.resources?.memory?.request,
+                  defaultValue: '512Mi',
+                }),
+              ),
             },
             limits: {
-              cpu: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString('1000m'),
-              memory: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString('1.5Gi'),
+              cpu: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(
+                this.cpuAsString({
+                  cpu: activeGateProps?.resources?.cpu?.limit,
+                  defaultValue: '1000m',
+                }),
+              ),
+              memory: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(
+                this.sizeAsString({
+                  size: activeGateProps?.resources?.memory?.limit,
+                  defaultValue: '1.5Gi',
+                }),
+              ),
             },
           },
         },
@@ -194,8 +255,31 @@ export class DynatraceKubernetesMonitoring extends Construct {
             },
           },
         } : {}),
-
       },
     });
+  }
+
+  private cpuAsString(props: { cpu: Cpu | string | number, defaultValue: string }): string {
+    if (typeof props.cpu === 'string') {
+      return props.cpu;
+    } else if (typeof props.cpu === 'number') {
+      return `${props.cpu}`;
+    } else if (props instanceof Cpu) {
+      return props.toString();
+    } else {
+      return props.defaultValue;
+    }
+  }
+
+  private sizeAsString(props: { size: Size | string | number, defaultValue: string }): string {
+    if (typeof props.size === 'string') {
+      return props.size;
+    } else if (typeof props.size === 'number') {
+      return `${props.size}`;
+    } else if (props instanceof Size) {
+      return props.toString();
+    } else {
+      return props.defaultValue;
+    }
   }
 }

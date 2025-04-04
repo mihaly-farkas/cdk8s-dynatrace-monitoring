@@ -1,8 +1,9 @@
 import { describe } from '@jest/globals';
-import { Chart, Testing } from 'cdk8s';
+import { Chart, Size, Testing } from 'cdk8s';
 import { DeploymentOption, DynatraceKubernetesMonitoring, DynatraceKubernetesMonitoringProps } from '../src';
 import * as yaml from 'js-yaml';
 import { toMatchFile } from 'jest-file-snapshot';
+import { ContainerResources, Cpu } from 'cdk8s-plus-32/lib/container';
 
 expect.extend({toMatchFile});
 
@@ -326,5 +327,33 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
         expect(warn).toBeCalledWith('WARNING: Namespace creation is skipped. Custom namespace properties will not be applied.');
       });
     });
+  });
+
+  describe.each([
+    ['example-1', {cpu: {request: Cpu.millis(100)}}],
+    ['example-2', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}}],
+    ['example-3', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256)}}],
+    ['example-4', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256), limit: Size.gibibytes(1)}}],
+  ])('when configured with custom resources (%s)', (dataSetName, resources: ContainerResources) => {
+
+    it('must produce a manifest with the given value.', () => {
+      const manifest = testDynatraceKubernetesMonitoring({
+        constructProps: {
+          deploymentOption: defaultDeploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+          activeGate: {
+            resources,
+          },
+        },
+        snapshotFileComment: 'The values in the active gate resources must match the specified ones.',
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/custom-active-gate-resources.${dataSetName}.yaml`);
+    });
+
   });
 });
