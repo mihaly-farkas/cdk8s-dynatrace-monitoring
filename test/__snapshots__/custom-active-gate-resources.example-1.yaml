@@ -33,6 +33,10 @@ spec:
       requests:
         cpu: 100m
         memory: 512Mi
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
   apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
   metadataEnrichment:
     enabled: true

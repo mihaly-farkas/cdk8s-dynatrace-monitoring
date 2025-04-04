@@ -363,6 +363,13 @@ export class DynatraceKubernetesMonitoring extends Construct {
               ...this.parseResourceRequest('memory', activeGateMemory?.limit, DEFAULT_ACTIVE_GATE_MEMORY_LIMIT),
             },
           },
+          tolerations: [
+            {
+              key: 'node-role.kubernetes.io/master',
+              operator: 'Exists',
+              effect: 'NoSchedule',
+            },
+          ],
         },
         ...(this.props.deploymentOption === DeploymentOption.APPLICATION && {
           oneAgent: {applicationMonitoring: {}},
