@@ -178,7 +178,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
     deploymentOption: DeploymentOption,
     namespace: string,
     apiUrl: string,
-    activeGateProps?: ActiveGateProps,
+    activeGate?: ActiveGateProps,
   ): DynaKubeV1Beta3 {
     return new DynaKubeV1Beta3(this, 'DynaKube', {
       metadata: {
@@ -203,32 +203,24 @@ export class DynatraceKubernetesMonitoring extends Construct {
           ],
           resources: {
             requests: {
-              cpu: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(
-                this.cpuAsString({
-                  cpu: activeGateProps?.resources?.cpu?.request,
-                  defaultValue: '500m',
-                }),
-              ),
-              memory: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(
-                this.sizeAsString({
-                  size: activeGateProps?.resources?.memory?.request,
-                  defaultValue: '512Mi',
-                }),
-              ),
+              cpu: this.parseResourceRequest({
+                value: activeGate?.resources?.cpu?.request,
+                defaultValue: '500m',
+              }),
+              memory: this.parseResourceRequest({
+                value: activeGate?.resources?.memory?.request,
+                defaultValue: '512Mi',
+              }),
             },
             limits: {
-              cpu: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(
-                this.cpuAsString({
-                  cpu: activeGateProps?.resources?.cpu?.limit,
-                  defaultValue: '1000m',
-                }),
-              ),
-              memory: DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(
-                this.sizeAsString({
-                  size: activeGateProps?.resources?.memory?.limit,
-                  defaultValue: '1.5Gi',
-                }),
-              ),
+              cpu: this.parseResourceRequest({
+                value: activeGate?.resources?.cpu?.limit,
+                defaultValue: '1000m',
+              }),
+              memory: this.parseResourceRequest({
+                value: activeGate?.resources?.memory?.limit,
+                defaultValue: '1.5Gi',
+              }),
             },
           },
         },
@@ -259,27 +251,17 @@ export class DynatraceKubernetesMonitoring extends Construct {
     });
   }
 
-  private cpuAsString(props: { cpu: Cpu | string | number, defaultValue: string }): string {
-    if (typeof props.cpu === 'string') {
-      return props.cpu;
-    } else if (typeof props.cpu === 'number') {
-      return `${props.cpu}`;
-    } else if (props instanceof Cpu) {
-      return props.toString();
+  private parseResourceRequest(props: { value: Cpu | Size | string | number | undefined, defaultValue: string }): DynaKubeV1Beta3SpecActiveGateResourcesRequests {
+    if (typeof props.value === 'string') {
+      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(props.value);
+    } else if (typeof props.value === 'number') {
+      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromNumber(props.value);
+    } else if (props.value instanceof Cpu) {
+      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(props.value.amount);
+    } else if (props.value instanceof Size) {
+      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(props.value.asString());
     } else {
-      return props.defaultValue;
-    }
-  }
-
-  private sizeAsString(props: { size: Size | string | number, defaultValue: string }): string {
-    if (typeof props.size === 'string') {
-      return props.size;
-    } else if (typeof props.size === 'number') {
-      return `${props.size}`;
-    } else if (props instanceof Size) {
-      return props.toString();
-    } else {
-      return props.defaultValue;
+      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(props.defaultValue);
     }
   }
 }
