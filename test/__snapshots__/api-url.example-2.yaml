@@ -33,6 +33,10 @@ spec:
       requests:
         cpu: 500m
         memory: 512Mi
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
   apiUrl: https://fd567567.live.dynatrace.com/api
   metadataEnrichment:
     enabled: true
