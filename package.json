@@ -9,7 +9,7 @@
     "kubernetes",
     "observability"
   ],
-  "version": "0.1.0-alpha.9",
+  "version": "0.1.0-alpha.10",
   "repository": {
     "type": "git",
     "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-monitoring.git"
@@ -20,13 +20,15 @@
   "private": true,
   "scripts": {
     "import": "npx cdk8s import",
-    "clean": "npx rimraf lib dist test-reports coverage .scannerwork",
+    "clean": "npx rimraf lib dist test-reports coverage .scannerwork docs-typedoc",
     "compile": "npx jsii",
     "test": "npx jest",
     "test:update-snapshot": "npx jest --updateSnapshot",
     "analyze:sonar": "npx sonar",
     "analyze": "npm run analyze:sonar",
     "build": "npm run clean && npm run test && npm run compile",
+    "docs:typedoc": "npx typedoc",
+    "docs": "npm run docs:typedoc",
     "upgrade:npm-packages": "npx npm-check-updates --upgrade --target semver && npm install",
     "upgrade:cdk8s": "npm install cdk8s@latest cdk8s-cli@latest",
     "upgrade:cdk8s-next": "npm install cdk8s@next cdk8s-cli@next",
@@ -70,6 +72,7 @@
     "rimraf": "^6.0.1",
     "ts-jest": "^29",
     "ts-node": "^10",
+    "typedoc": "^0.28.1",
     "typescript": "^5.8.2"
   },
   "jsii": {

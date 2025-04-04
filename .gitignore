@@ -8,12 +8,13 @@
 .env.*
 
 
-# cdk8s files
+# cdk8s files (TypeScript)
 dist/
 coverage/
 lib/
 node_modules/
 test-reports/
+docs-typedoc/
 *.d.ts
 *.js
 !jest.config.js

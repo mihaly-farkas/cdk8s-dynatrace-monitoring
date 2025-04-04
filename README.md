@@ -1,11 +1,14 @@
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cdk8s-dynatrace-monitoring&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=cdk8s-dynatrace-monitoring)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mihaly-farkas_cdk8s-dynatrace-monitoring&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mihaly-farkas_cdk8s-dynatrace-monitoring)
 
 # cdk8s-dynatrace-monitoring
 
-**cdk8s-dynatrace-monitoring** is a high-level library that simplifies the integration of
+This package is a high-level library that simplifies the integration of
 [Dynatrace Kubernetes monitoring](https://www.dynatrace.com/monitoring/technologies/kubernetes-monitoring/) into your
 [Kubernetes](https://kubernetes.io/) clusters.
-It streamlines the setup process by automating the creation of the necessary monitoring resources, enabling quick and
+It provides reusable 
+[cdk8s](https://cdk8s.io/)
+[constructs](https://cdk8s.io/docs/latest/basics/constructs/)
+to streamlines the setup process by automating the creation of the necessary monitoring resources, enabling quick and 
 efficient observability and performance monitoring.
 
 ## Getting Started

@@ -33,7 +33,7 @@ jobs:
       - name: Run tests
         run: npm run test
 
-      - name: Run SonarQube analysis
-        run: npm run analyze:sonar
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

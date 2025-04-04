@@ -1,0 +1,10 @@
+{
+  "entryPoints": [
+    "src/index.ts"
+  ],
+  "out": "docs-typedoc",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "readme": "docs/typedoc-intro.md"
+}
