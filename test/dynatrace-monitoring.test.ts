@@ -1,6 +1,6 @@
 import { describe } from '@jest/globals';
 import { Chart, Size, Testing } from 'cdk8s';
-import { DeploymentOption, DynatraceContainerResources, DynatraceMonitoring, DynatraceMonitoringProps, MetadataProps } from '../src';
+import { DeploymentOption, DynatraceCapability, DynatraceContainerResources, DynatraceMonitoring, DynatraceMonitoringProps, MetadataProps } from '../src';
 import * as yaml from 'js-yaml';
 import { toMatchFile } from 'jest-file-snapshot';
 import { Cpu } from 'cdk8s-plus-32/lib/container';
@@ -388,6 +388,35 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
 
       // Assert
       expect(manifest).toMatchFile(`${snapshotsDir}/custom-active-gate-resources.${dataSetName}.yaml`);
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe.each([
+    ['example-1', [DynatraceCapability.DYNATRACE_API]],
+    ['example-2', [DynatraceCapability.DYNATRACE_API, DynatraceCapability.METRICS_INGEST]],
+    ['example-3', [DynatraceCapability.DYNATRACE_API, DynatraceCapability.DYNATRACE_API, DynatraceCapability.METRICS_INGEST, DynatraceCapability.METRICS_INGEST]],
+  ])('when configured with custom capabilities (%s)', (dataSetName: string, capabilities: DynatraceCapability[]) => {
+
+    it('must produce a manifest with the given values.', () => {
+      const warn = mockWarn();
+
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: defaultDeploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+          activeGate: {
+            capabilities,
+          },
+        },
+        snapshotFileComment: 'The values in the active gate capabilities must contain the specified ones.',
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/custom-active-gate-capabilities.${dataSetName}.yaml`);
       expect(warn).not.toHaveBeenCalled();
     });
   });
