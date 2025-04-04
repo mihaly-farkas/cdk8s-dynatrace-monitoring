@@ -17,4 +17,9 @@ export enum DeploymentOption {
    * Kubernetes platform monitoring + Application observability
    */
   APPLICATION = 'application',
+
+  /**
+   * Kubernetes platform monitoring + Full-stack observability
+   */
+  FULL_STACK = 'full-stack',
 }

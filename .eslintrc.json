@@ -201,6 +201,12 @@
     "no-bitwise": [
       "error"
     ],
+    "newline-per-chained-call": [
+      "error",
+      {
+        "ignoreChainWithDepth": 1
+      }
+    ],
     "@typescript-eslint/member-ordering": [
       "error",
       {
