@@ -1,4 +1,4 @@
-# The expected output is the same as the one published on the Dynatrace website:
+# Must match the manifest published in Dynatrace docs.
 # https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/application-observability#helm
 apiVersion: v1
 kind: Namespace

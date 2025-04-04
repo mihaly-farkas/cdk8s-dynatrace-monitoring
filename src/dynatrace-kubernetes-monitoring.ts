@@ -1,235 +1,373 @@
-import { Construct } from 'constructs';
-import { ApiObjectMetadata, Size } from 'cdk8s';
-import { Namespace, Secret } from 'cdk8s-plus-32';
-import { DynaKubeV1Beta3, DynaKubeV1Beta3SpecActiveGateResourcesRequests } from 'cdk8s-imports/dynatrace.com';
-import { DEFAULT_DYNA_KUBE_NAME, DEFAULT_NAMESPACE, DEFAULT_SECRET_NAME } from './constants';
-import { DeploymentOption } from './deployment-option';
-import { Cpu } from 'cdk8s-plus-32/lib/container';
+/**
+ * @fileoverview This module defines a CDK8s construct for deploying Dynatrace monitoring resources to a Kubernetes
+ * cluster.
+ *
+ * @module cdk8s-dynatrace-kubernetes-monitoring
+ */
 
+import { ApiObjectMetadata, Size } from 'cdk8s';
+import { Cpu, Namespace, Secret } from 'cdk8s-plus-32';
+import { DynaKubeV1Beta3, DynaKubeV1Beta3SpecActiveGateResourcesRequests } from 'cdk8s-imports/dynatrace.com';
+import { Construct } from 'constructs';
+import {
+  DEFAULT_ACTIVE_GATE_CPU_LIMIT,
+  DEFAULT_ACTIVE_GATE_CPU_REQUEST,
+  DEFAULT_ACTIVE_GATE_MEMORY_LIMIT,
+  DEFAULT_ACTIVE_GATE_MEMORY_REQUEST,
+  DEFAULT_DYNA_KUBE_NAME,
+  DEFAULT_NAMESPACE,
+} from './constants';
 
 /**
- * Namespace properties without the `name` and `namespace` fields.
+ * A subset of Kubernetes metadata, excluding the `name` and `namespace`.
  *
- * In this construct, we use a separate {@link DynatraceKubernetesMonitoringProps#namespaceName} property
- * for setting the namespace name. To ensure clarity and avoid handling precedence rules or a property combination mess,
- * we omit the `name` field.
- *
- * We also omit the `namespace` field, as it is not applicable in this context.
+ * The `name` and `namespace` are determined by the construct itself based on custom logic.
+ * This class was created to avoid any confusion due to this behavior.
+ * All other metadata fields will be passed unchanged to the underlying resources.
  */
-type OmittedNamespaceProps = Omit<ApiObjectMetadata, 'name' | 'namespace'>
+export type MetadataProps = Omit<ApiObjectMetadata, 'name' | 'namespace'>;
 
+/**
+ * Dynatrace authentication tokens.
+ */
 export interface DynatraceTokens {
 
   /**
-   * The API token for Dynatrace monitoring.
+   * Dynatrace API token (required).
+   *
+   * The API token is required for the Dynatrace operator to communicate with the Dynatrace platform.
+   * Ensure that the following scopes are enabled for your API token:
+   * - _Read settings_
+   * - _Write settings_
+   * - _Read entities_
+   * - _Installer download_
+   * - _Access problem and event feed, metrics, and topology_
+   * - _Create ActiveGate tokens_
+   *
+   * To create an API token, use the _Access Tokens_ page in the Dynatrace UI.
    */
   readonly apiToken: string;
 
+  /**
+   * Optional data ingest token for metrics, logs, and OpenTelemetry traces.
+   *
+   * This token is used for ingesting metrics, logs, and OpenTelemetry traces from pods
+   * outside the Dynatrace namespace.
+   * It is only applicable if you are using advanced deployment options (APPLICATION/FULL_STACK).
+   * Ensure that the following scopes are enabled for your data ingest token:
+   *
+   * - _Ingest metrics_
+   * - _Ingest logs_
+   * - _Ingest OpenTelemetry traces_
+   *
+   * To create a data ingest token, use the _Access Tokens_ page in the Dynatrace UI.
+   */
   readonly dataIngestToken?: string;
 }
 
 /**
- * CPU request and limit
+ * CPU resource configuration for Dynatrace monitoring.
+ *
+ * For valid values and units of measurement, refer to the corresponding
+ * [Memory resource units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
+ * documentation.
  */
 export interface DynatraceCpuResources {
+
+  /**
+   * CPU request value.
+   */
   readonly request?: Cpu | string | number;
+
+  /**
+   * CPU limit value.
+   */
   readonly limit?: Cpu | string | number;
 }
 
 /**
- * Memory request and limit
+ * Memory resource configuration.
+ *
+ * For valid values and units of measurement, refer to the corresponding
+ * [CPU resource units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-cpu)
+ * documentation.
  */
 export interface DynatraceMemoryResources {
+
+  /**
+   * Memory request value.
+   */
   readonly request?: Size | string | number;
+
+  /**
+   * Memory limit value.
+   */
   readonly limit?: Size | string | number;
 }
 
 /**
- * Compute resources.
+ * CPU and memory resource configuration for the Dynatrace container.
+ *
+ * These configurations are optional, but can be customized for your deployment needs.
  */
 export interface DynatraceContainerResources {
+
+  /**
+   * CPU configuration for the Dynatrace container.
+   */
   readonly cpu?: DynatraceCpuResources;
+
+  /**
+   * Memory configuration for the Dynatrace container.
+   */
   readonly memory?: DynatraceMemoryResources;
 }
 
+/**
+ * Properties related to ActiveGate configuration in Dynatrace.
+ */
 export interface ActiveGateProps {
 
+  /**
+   * CPU and memory resource configurations for the ActiveGate pod(s).
+   *
+   * Consumption of the ActiveGate heavily depends on the workload to monitor.
+   * The values should be adjusted according to the expected workload.
+   */
   resources: DynatraceContainerResources;
 }
 
 /**
- * Properties for configuring Dynatrace Kubernetes monitoring.
+ * Specifies the deployment and observability options.
+ *
+ * The options have different capabilities, licensing, pricing, etc.
+ *
+ * For more information, see the Dynatrace documentation:
+ * [Observability options](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment#observability-options)
+ */
+export enum DeploymentOption {
+
+  /**
+   * Kubernetes platform monitoring.
+   */
+  PLATFORM = 'platform',
+
+  /**
+   * Kubernetes platform monitoring + Application observability.
+   */
+  APPLICATION = 'application',
+
+  /**
+   * Kubernetes platform monitoring + Full-stack observability.
+   */
+  FULL_STACK = 'full-stack',
+}
+
+/**
+ * Configuration options for setting up Dynatrace monitoring on Kubernetes.
  */
 export interface DynatraceKubernetesMonitoringProps {
 
   /**
-   * The deployment option for Dynatrace monitoring.
+   * Dynatrace API endpoint URL.
+   */
+  readonly apiUrl: string;
+
+  /**
+   * Deployment mode for Dynatrace monitoring.
    */
   readonly deploymentOption: DeploymentOption;
 
   /**
-   * The name of the namespace.
+   * Dynatrace access tokens for authentication.
+   */
+  readonly tokens: DynatraceTokens;
+
+  /**
+   * Optional ActiveGate configuration.
+   */
+  readonly activeGate?: ActiveGateProps;
+
+  /**
+   * The name of the Kubernetes namespace the Dynatrace resources to deploy to.
    *
-   * If not specified, the `dynatrace` name will be used.
-   *
-   * @default - The `dynatrace` namespace will be used.
+   * @default 'dynatrace'
    */
   readonly namespaceName?: string;
 
   /**
-   * Properties for the namespace to be created.
+   * Additional metadata properties for the Kubernetes namespace.
    *
-   * If {@link skipNamespaceCreation} is set to `true`, this property will be ignored.
+   * Ignored if `skipNamespaceCreation` is true.
    */
-  readonly namespaceProps?: OmittedNamespaceProps;
-
+  readonly namespaceProps?: MetadataProps;
 
   /**
-   * Whether to skip the creation of the Dynatrace monitoring namespace.
+   * Whether to skip the creation of the Kubernetes namespace.
    *
-   * If set to `true`, the namespace will not be created automatically, and we assume that the user has already created
-   * it.
+   * If true, `namespaceProps` will not be used as the namespace name and assuming that the namespace already exists.
    *
    * @default false
    */
   readonly skipNamespaceCreation?: boolean;
-
-  readonly apiUrl: string;
-
-  readonly tokens: DynatraceTokens;
-
-  readonly activeGate?: ActiveGateProps;
 }
 
-
 /**
- * Sets up Dynatrace monitoring for a Kubernetes cluster.
+ * CDK8s construct for deploying Dynatrace monitoring to a Kubernetes cluster.
  *
- * ...
+ * It provides configuration options for integrating Dynatrace with Kubernetes, including the setup of monitoring
+ * agents, ActiveGate configurations, and namespace management.
+ * The Dynatrace Kubernetes monitoring setup is highly customizable, allowing users to configure CPU, memory resources,
+ * and authentication tokens for communication with the Dynatrace platform.
+ *
+ * Key functionalities:
+ * - Setting up Dynatrace monitoring with configurable CPU and memory resources.
+ * - Optionally creating and configuring a Kubernetes namespace for Dynatrace resources.
+ * - Managing Dynatrace API and data ingest tokens.
+ * - Defining deployment options (e.g., platform monitoring, application observability, full-stack observability).
+ * - Providing a scalable and flexible solution for monitoring Kubernetes clusters with Dynatrace.
  */
 export class DynatraceKubernetesMonitoring extends Construct {
 
-  public readonly namespaceName: string;
-
-  public readonly secret: Secret;
-
-  public readonly dynaKube: DynaKubeV1Beta3;
+  /**
+   * The Kubernetes namespace where the Dynatrace resources will be deployed, if this construct is responsible for
+   * creating the namespace.
+   *
+   * If the skipNamespaceCreation property is set to true, this property will be undefined.
+   */
+  public readonly namespace?: Namespace;
 
   /**
-   * Instantiates a new Dynatrace Kubernetes monitoring instance.
+   * Secret containing Dynatrace tokens.
+   */
+  public readonly secret: Secret;
+
+  /**
+   * Dynatrace Kubernetes monitoring instance.
+   */
+  public readonly dynaKube: DynaKubeV1Beta3;
+
+  private readonly props: DynatraceKubernetesMonitoringProps;
+
+  /**
+   * Creates a new Dynatrace monitoring setup.
    *
-   * @param scope The scope in which this construct is defined.
-   * @param id The id of the construct.
-   * @param props The properties of the construct.
+   * @param scope Scope in which this construct is defined.
+   * @param id Unique ID of the construct.
+   * @param props Configuration options.
    */
   constructor(scope: Construct, id: string, props: DynatraceKubernetesMonitoringProps) {
     super(scope, id);
 
-    this.namespaceName = this.getNamespaceName(props.namespaceName);
+    this.props = props;
 
-    if (props.skipNamespaceCreation !== true) {
-      this.createNamespace(this.namespaceName, props.namespaceProps);
+    if (!props.skipNamespaceCreation) {
+      this.namespace = this.createNamespace();
     } else if (props.namespaceProps) {
       console.warn('WARNING: Namespace creation is skipped. Custom namespace properties will not be applied.');
     }
 
-    this.secret = this.createSecret(props.deploymentOption, this.namespaceName, props.tokens.apiToken, props.tokens.dataIngestToken);
-
-    this.dynaKube = this.createDynaKube(
-      props.deploymentOption,
-      this.namespaceName,
-      props.apiUrl,
-      props.activeGate,
-    );
+    this.secret = this.createSecret();
+    this.dynaKube = this.createDynaKube();
   }
 
-  private getNamespaceName(requestedNamespaceName?: string): string {
-    return requestedNamespaceName ?? DEFAULT_NAMESPACE;
+  /**
+   * The name of the Kubernetes namespace.
+   */
+  public get namespaceName(): string {
+    return this.props.namespaceName ?? DEFAULT_NAMESPACE;
   }
 
-  private createNamespace(name: string, namespaceProps?: OmittedNamespaceProps): Namespace {
+  /**
+   * Creates a new Kubernetes namespace for Dynatrace resources.
+   *
+   * @returns The created namespace.
+   */
+  private createNamespace(): Namespace {
     return new Namespace(this, 'Namespace', {
       metadata: {
-        name,
-        ...namespaceProps,
+        name: this.namespaceName,
+        ...this.props.namespaceProps,
       },
     });
   }
 
-  private createSecret(deploymentOption: DeploymentOption, namespace: string, apiToken: string, dataIngestToken?: string): Secret {
-    if (deploymentOption === DeploymentOption.PLATFORM && dataIngestToken) {
+  /**
+   * Creates a new secret containing Dynatrace API and optional data ingest tokens.
+   *
+   * @returns The created secret.
+   */
+  private createSecret(): Secret {
+    return new Secret(this, 'Secret', {
+      metadata: {
+        ...this.getNameAndNamespaceMetadata(),
+      },
+      type: 'Opaque',
+      stringData: this.createSecretData(),
+    });
+  }
+
+  /**
+   * Creates the secret data, which includes the API token and optionally the data ingest token.
+   *
+   * @returns The secret data.
+   */
+  private createSecretData(): Record<string, string> {
+    const stringData: Record<string, string> = {
+      apiToken: this.props.tokens.apiToken,
+    };
+
+    if (this.isAdvancedDeployment() && this.props.tokens.dataIngestToken) {
+      stringData.dataIngestToken = this.props.tokens.dataIngestToken;
+    } else if (this.props.tokens.dataIngestToken) {
       console.warn('WARNING: Data ingest token is not supported for platform monitoring. It will be ignored.');
     }
 
-    return new Secret(this, 'Secret', {
-      metadata: {
-        name: DEFAULT_SECRET_NAME,
-        namespace: namespace,
-      },
-      type: 'Opaque',
-      stringData: {
-        apiToken: apiToken,
-        ...(deploymentOption !== DeploymentOption.PLATFORM ? {dataIngestToken: dataIngestToken} : {}),
-      },
-    });
+    return stringData;
   }
 
-  private createDynaKube(
-    deploymentOption: DeploymentOption,
-    namespace: string,
-    apiUrl: string,
-    activeGate?: ActiveGateProps,
-  ): DynaKubeV1Beta3 {
+  /**
+   * Creates the Dynatrace Kubernetes monitoring configuration instance (`DynaKube`).
+   *
+   * @returns The created `DynaKube` instance.
+   */
+  private createDynaKube(): DynaKubeV1Beta3 {
+    const activeGateCpu = this.props.activeGate?.resources?.cpu;
+    const activeGateMemory = this.props.activeGate?.resources?.memory;
+
     return new DynaKubeV1Beta3(this, 'DynaKube', {
       metadata: {
-        name: DEFAULT_DYNA_KUBE_NAME,
-        namespace: namespace,
+        ...this.getNameAndNamespaceMetadata(),
         annotations: {
           'feature.dynatrace.com/k8s-app-enabled': 'true',
-          ...(deploymentOption !== DeploymentOption.PLATFORM ? {
-            'feature.dynatrace.com/injection-readonly-volume': 'true',
-          } : {}),
+          ...(this.isAdvancedDeployment() && {'feature.dynatrace.com/injection-readonly-volume': 'true'}),
         },
       },
       spec: {
-        apiUrl,
+        apiUrl: this.props.apiUrl,
         metadataEnrichment: {
           enabled: true,
         },
         activeGate: {
           capabilities: [
             'kubernetes-monitoring',
-            ...(deploymentOption !== DeploymentOption.PLATFORM ? ['routing'] : []),
+            ...(this.isAdvancedDeployment() && ['routing'] || []),
           ],
           resources: {
             requests: {
-              cpu: this.parseResourceRequest({
-                value: activeGate?.resources?.cpu?.request,
-                defaultValue: '500m',
-              }),
-              memory: this.parseResourceRequest({
-                value: activeGate?.resources?.memory?.request,
-                defaultValue: '512Mi',
-              }),
+              ...this.parseResourceRequest('cpu', activeGateCpu?.request, DEFAULT_ACTIVE_GATE_CPU_REQUEST),
+              ...this.parseResourceRequest('memory', activeGateMemory?.request, DEFAULT_ACTIVE_GATE_MEMORY_REQUEST),
             },
             limits: {
-              cpu: this.parseResourceRequest({
-                value: activeGate?.resources?.cpu?.limit,
-                defaultValue: '1000m',
-              }),
-              memory: this.parseResourceRequest({
-                value: activeGate?.resources?.memory?.limit,
-                defaultValue: '1.5Gi',
-              }),
+              ...this.parseResourceRequest('cpu', activeGateCpu?.limit, DEFAULT_ACTIVE_GATE_CPU_LIMIT),
+              ...this.parseResourceRequest('memory', activeGateMemory?.limit, DEFAULT_ACTIVE_GATE_MEMORY_LIMIT),
             },
           },
         },
-        ...(deploymentOption === DeploymentOption.APPLICATION ? {
-          oneAgent: {
-            applicationMonitoring: {},
-          },
-        } : {}),
-        ...(deploymentOption === DeploymentOption.FULL_STACK ? {
+        ...(this.props.deploymentOption === DeploymentOption.APPLICATION && {
+          oneAgent: {applicationMonitoring: {}},
+        }),
+        ...(this.props.deploymentOption === DeploymentOption.FULL_STACK && {
           oneAgent: {
             cloudNativeFullStack: {
               tolerations: [
@@ -246,22 +384,58 @@ export class DynatraceKubernetesMonitoring extends Construct {
               ],
             },
           },
-        } : {}),
+        }),
       },
     });
   }
 
-  private parseResourceRequest(props: { value: Cpu | Size | string | number | undefined, defaultValue: string }): DynaKubeV1Beta3SpecActiveGateResourcesRequests {
-    if (typeof props.value === 'string') {
-      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(props.value);
-    } else if (typeof props.value === 'number') {
-      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromNumber(props.value);
-    } else if (props.value instanceof Cpu) {
-      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(props.value.amount);
-    } else if (props.value instanceof Size) {
-      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(props.value.asString());
-    } else {
-      return DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(props.defaultValue);
-    }
+  /**
+   * Returns the metadata for the `name` and `namespace` of the Dynatrace resources.
+   *
+   * @returns The metadata object containing `name` and `namespace`.
+   */
+  private getNameAndNamespaceMetadata(): { name: string; namespace?: string } {
+    return {
+      name: DEFAULT_DYNA_KUBE_NAME,
+      namespace: this.namespaceName,
+    };
+  }
+
+  /**
+   * Parses a resource request value for CPU or memory.
+   *
+   * Converts the value to a Dynatrace `ActiveGateResourcesRequests` object.
+   * If no value is provided, and the default value is provided, it falls back to the default, otherwise returns an
+   * empty object.
+   *
+   * @param key The resource type (e.g., 'cpu', 'memory').
+   * @param value The value to parse (could be a string, number, or instance of `Cpu`/`Size`).
+   * @param defaultValue Optional default value used when the value is undefined.
+   * @returns An object with the parsed resource request for the given key.
+   */
+  private parseResourceRequest(key: string, value: Cpu | Size | string | number | undefined, defaultValue?: string): Record<string, DynaKubeV1Beta3SpecActiveGateResourcesRequests> {
+    let outputValue: DynaKubeV1Beta3SpecActiveGateResourcesRequests | undefined = undefined;
+
+    // The actual parsing of the primitive types is done by the imported class of the Dynatrace operator
+    if (value instanceof Cpu) outputValue = DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(value.amount);
+    if (value instanceof Size) outputValue = DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(value.asString());
+    if (typeof value === 'string') outputValue = DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(value);
+    if (typeof value === 'number') outputValue = DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromNumber(value);
+    if (!outputValue && defaultValue) outputValue = DynaKubeV1Beta3SpecActiveGateResourcesRequests.fromString(defaultValue);
+
+    return outputValue && {[key]: outputValue} || {};
+  }
+
+  /**
+   * Determines whether the deployment option is advanced (i.e., APPLICATION or FULL_STACK).
+   *
+   * @returns `true` if the deployment option is one of the advanced ones, `false` otherwise.
+   */
+  private isAdvancedDeployment(): boolean {
+    const advancedOptions = new Set([
+      DeploymentOption.FULL_STACK,
+      DeploymentOption.APPLICATION,
+    ]);
+    return advancedOptions.has(this.props.deploymentOption);
   }
 }
