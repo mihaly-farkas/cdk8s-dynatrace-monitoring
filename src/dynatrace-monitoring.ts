@@ -155,6 +155,15 @@ export enum DynatraceCapability {
  */
 export interface ActiveGateProps {
 
+  /**
+   * Optional list of additional ActiveGate capabilities to enable.
+   *
+   * These capabilities extend the functionality of the ActiveGate component.
+   * The construct automatically includes essential capabilities like `kubernetes-monitoring`
+   * and `routing` based on the selected deployment option, so they do not need to be specified here.
+   *
+   * Use this property to explicitly enable additional features such as `metrics-ingest` or `dynatrace-api`.
+   */
   capabilities?: DynatraceCapability[];
 
   /**
