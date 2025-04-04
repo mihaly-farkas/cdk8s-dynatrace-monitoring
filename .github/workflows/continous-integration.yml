@@ -33,6 +33,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+          cache: npm
+
+      - name: Get project version
+        id: get_version
+        run: |
+          echo "version=$(npm pkg get version | tr -d '"')" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
         run: npm ci
@@ -42,6 +48,9 @@ jobs:
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v5
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ steps.get_version.outputs.version }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
