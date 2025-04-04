@@ -1,8 +1,9 @@
 import { describe } from '@jest/globals';
-import { Chart, Testing } from 'cdk8s';
-import { DeploymentOption, DynatraceKubernetesMonitoring, DynatraceKubernetesMonitoringProps } from '../src';
+import { Chart, Size, Testing } from 'cdk8s';
+import { DeploymentOption, DynatraceContainerResources, DynatraceKubernetesMonitoring, DynatraceKubernetesMonitoringProps } from '../src';
 import * as yaml from 'js-yaml';
 import { toMatchFile } from 'jest-file-snapshot';
+import { Cpu } from 'cdk8s-plus-32/lib/container';
 
 expect.extend({toMatchFile});
 
@@ -326,5 +327,37 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
         expect(warn).toBeCalledWith('WARNING: Namespace creation is skipped. Custom namespace properties will not be applied.');
       });
     });
+  });
+
+  describe.each([
+    ['example-1', {cpu: {request: Cpu.millis(100)}}],
+    ['example-2', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}}],
+    ['example-3', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256)}}],
+    ['example-4', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256), limit: Size.gibibytes(1)}}],
+    ['example-5', {cpu: {request: 0.1, limit: '200m'}}],
+    ['example-6', {cpu: {request: 0.5, limit: 1}}],
+    ['example-7', {cpu: {request: 1.5, limit: 1.9}}],
+    ['example-8', {memory: {request: 1024, limit: '1Gi'}}],
+  ])('when configured with custom resources (%s)', (dataSetName, resources: DynatraceContainerResources) => {
+
+    it('must produce a manifest with the given value.', () => {
+      const manifest = testDynatraceKubernetesMonitoring({
+        constructProps: {
+          deploymentOption: defaultDeploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+          activeGate: {
+            resources,
+          },
+        },
+        snapshotFileComment: 'The values in the active gate resources must match the specified ones.',
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/custom-active-gate-resources.${dataSetName}.yaml`);
+    });
+
   });
 });
