@@ -1,2 +1,2 @@
 export * from './constants';
-export * from './dynatrace-kubernetes-monitoring';
+export * from './dynatrace-monitoring';

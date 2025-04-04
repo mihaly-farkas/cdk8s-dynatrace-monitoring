@@ -1,7 +1,7 @@
 /**
  * @fileoverview This file contains constants necessary for Dynatrace Kubernetes monitoring.
  *
- * @module cdk8s-dynatrace-kubernetes-monitoring
+ * @module cdk8s-dynatrace-monitoring
  */
 
 /**

@@ -2,7 +2,7 @@
  * @fileoverview This module defines a CDK8s construct for deploying Dynatrace monitoring resources to a Kubernetes
  * cluster.
  *
- * @module cdk8s-dynatrace-kubernetes-monitoring
+ * @module cdk8s-dynatrace-monitoring
  */
 
 import { ApiObjectMetadata, Size } from 'cdk8s';
@@ -166,7 +166,7 @@ export enum DeploymentOption {
 /**
  * Configuration options for setting up Dynatrace monitoring on Kubernetes.
  */
-export interface DynatraceKubernetesMonitoringProps {
+export interface DynatraceMonitoringProps {
 
   /**
    * Dynatrace API endpoint URL.
@@ -227,7 +227,7 @@ export interface DynatraceKubernetesMonitoringProps {
  * - Defining deployment options (e.g., platform monitoring, application observability, full-stack observability).
  * - Providing a scalable and flexible solution for monitoring Kubernetes clusters with Dynatrace.
  */
-export class DynatraceKubernetesMonitoring extends Construct {
+export class DynatraceMonitoring extends Construct {
 
   /**
    * The Kubernetes namespace where the Dynatrace resources will be deployed, if this construct is responsible for
@@ -247,7 +247,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
    */
   public readonly dynaKube: DynaKubeV1Beta3;
 
-  private readonly props: DynatraceKubernetesMonitoringProps;
+  private readonly props: DynatraceMonitoringProps;
 
   /**
    * Creates a new Dynatrace monitoring setup.
@@ -256,7 +256,7 @@ export class DynatraceKubernetesMonitoring extends Construct {
    * @param id Unique ID of the construct.
    * @param props Configuration options.
    */
-  constructor(scope: Construct, id: string, props: DynatraceKubernetesMonitoringProps) {
+  constructor(scope: Construct, id: string, props: DynatraceMonitoringProps) {
     super(scope, id);
 
     this.props = props;

@@ -1,6 +1,6 @@
 import { describe } from '@jest/globals';
 import { Chart, Size, Testing } from 'cdk8s';
-import { DeploymentOption, DynatraceContainerResources, DynatraceKubernetesMonitoring, DynatraceKubernetesMonitoringProps, MetadataProps } from '../src';
+import { DeploymentOption, DynatraceContainerResources, DynatraceMonitoring, DynatraceMonitoringProps, MetadataProps } from '../src';
 import * as yaml from 'js-yaml';
 import { toMatchFile } from 'jest-file-snapshot';
 import { Cpu } from 'cdk8s-plus-32/lib/container';
@@ -18,13 +18,13 @@ const defaultApiToken = '*** API TOKEN 1 ***';
 const mockWarn = () => jest.spyOn(console, 'warn').mockImplementation(() => {
 });
 
-const testDynatraceKubernetesMonitoring = (props: { constructProps: DynatraceKubernetesMonitoringProps, snapshotFileComment?: string }): string => {
+const testDynatraceMonitoring = (props: { constructProps: DynatraceMonitoringProps, snapshotFileComment?: string }): string => {
   // Arrange
   const app = Testing.app();
   const chart = new Chart(app, 'test');
 
   // Act
-  new DynatraceKubernetesMonitoring(chart, 'dynatrace-kubernetes-monitoring', props.constructProps);
+  new DynatraceMonitoring(chart, 'dynatrace-monitoring', props.constructProps);
 
   const yamlCommentLines = props?.snapshotFileComment
                                 ?.trim()
@@ -52,7 +52,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
       it('must produce a manifest identical to the one published on the Dynatrace website.', () => {
         const warn = mockWarn();
 
-        const manifest = testDynatraceKubernetesMonitoring({
+        const manifest = testDynatraceMonitoring({
           constructProps: {
             deploymentOption: DeploymentOption.PLATFORM,
             apiUrl: defaultApiUrl,
@@ -79,7 +79,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
       it('must produce a manifest identical to the one published on the Dynatrace website.', () => {
         const warn = mockWarn();
 
-        const manifest = testDynatraceKubernetesMonitoring({
+        const manifest = testDynatraceMonitoring({
           constructProps: {
             deploymentOption: DeploymentOption.APPLICATION,
             apiUrl: defaultApiUrl,
@@ -106,7 +106,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
       it('must produce a manifest identical to the one published on the Dynatrace website.', () => {
         const warn = mockWarn();
 
-        const manifest = testDynatraceKubernetesMonitoring({
+        const manifest = testDynatraceMonitoring({
           constructProps: {
             deploymentOption: DeploymentOption.FULL_STACK,
             apiUrl: defaultApiUrl,
@@ -134,7 +134,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
 
-      const manifest = testDynatraceKubernetesMonitoring({
+      const manifest = testDynatraceMonitoring({
         constructProps: {
           deploymentOption: defaultDeploymentOption,
           apiUrl: apiUrl,
@@ -159,7 +159,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
 
-      const manifest = testDynatraceKubernetesMonitoring({
+      const manifest = testDynatraceMonitoring({
         constructProps: {
           deploymentOption: defaultDeploymentOption,
           apiUrl: defaultApiUrl,
@@ -184,7 +184,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
 
-      const manifest = testDynatraceKubernetesMonitoring({
+      const manifest = testDynatraceMonitoring({
         constructProps: {
           deploymentOption: deploymentOption,
           apiUrl: defaultApiUrl,
@@ -214,7 +214,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
 
-      const manifest = testDynatraceKubernetesMonitoring({
+      const manifest = testDynatraceMonitoring({
         constructProps: {
           deploymentOption: deploymentOption,
           apiUrl: defaultApiUrl,
@@ -240,7 +240,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
 
-      const manifest = testDynatraceKubernetesMonitoring({
+      const manifest = testDynatraceMonitoring({
         constructProps: {
           deploymentOption: defaultDeploymentOption,
           apiUrl: defaultApiUrl,
@@ -266,7 +266,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
 
-      const manifest = testDynatraceKubernetesMonitoring({
+      const manifest = testDynatraceMonitoring({
         constructProps: {
           deploymentOption: defaultDeploymentOption,
           apiUrl: defaultApiUrl,
@@ -289,7 +289,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
 
-      const manifest = testDynatraceKubernetesMonitoring({
+      const manifest = testDynatraceMonitoring({
         constructProps: {
           deploymentOption: defaultDeploymentOption,
           apiUrl: defaultApiUrl,
@@ -308,7 +308,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
 
     describe('and with custom namespace name', () => {
       it('must produce a manifest with the given value.', () => {
-        const manifest = testDynatraceKubernetesMonitoring({
+        const manifest = testDynatraceMonitoring({
           constructProps: {
             deploymentOption: defaultDeploymentOption,
             apiUrl: defaultApiUrl,
@@ -329,7 +329,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
       it('must produce a manifest with the given value.', () => {
         const warn = mockWarn();
 
-        const manifest = testDynatraceKubernetesMonitoring({
+        const manifest = testDynatraceMonitoring({
           constructProps: {
             deploymentOption: defaultDeploymentOption,
             apiUrl: defaultApiUrl,
@@ -372,7 +372,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
 
-      const manifest = testDynatraceKubernetesMonitoring({
+      const manifest = testDynatraceMonitoring({
         constructProps: {
           deploymentOption: defaultDeploymentOption,
           apiUrl: defaultApiUrl,

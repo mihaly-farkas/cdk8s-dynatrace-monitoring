@@ -1,7 +1,7 @@
 {
   "author": "Mihaly Farkas",
-  "name": "@mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring",
-  "description": "Dynatrace Kubernetes monitoring construct for cdk8s.",
+  "name": "@mihaly-farkas/cdk8s-dynatrace-monitoring",
+  "description": "Dynatrace monitoring construct for cdk8s.",
   "keywords": [
     "cdk8s",
     "dynatrace",
@@ -9,10 +9,10 @@
     "kubernetes",
     "observability"
   ],
-  "version": "0.1.0-alpha.7",
+  "version": "0.1.0-alpha.8",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring.git"
+    "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-monitoring.git"
   },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -49,7 +49,7 @@
     "constructs": "^10.4.2"
   },
   "dependencies": {
-    "cdk8s": "^2.69.59",
+    "cdk8s": "^2.69.60",
     "cdk8s-imports": "./imports",
     "js-yaml": "^4.1.0"
   },
@@ -59,7 +59,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22",
     "cdk8s-cli": "^2.200.32",
-    "cdk8s-plus-32": "2.0.8",
+    "cdk8s-plus-32": "2.0.9",
     "constructs": "10.4.2",
     "jest": "^29",
     "jest-file-snapshot": "^0.7.0",
@@ -76,22 +76,22 @@
     "outdir": "dist",
     "targets": {
       "java": {
-        "package": "net.mihaly-farkas.dynatrace-kubernetes-monitoring",
+        "package": "net.mihaly-farkas.dynatrace-monitoring",
         "maven": {
           "groupId": "net.mihaly-farkas",
-          "artifactId": "cdk8s-dynatrace-kubernetes-monitoring"
+          "artifactId": "cdk8s-dynatrace-monitoring"
         }
       },
       "python": {
-        "distName": "cdk8s-dynatrace-kubernetes-monitoring",
-        "module": "cdk8s_dynatrace-kubernetes-monitoring"
+        "distName": "cdk8s-dynatrace-monitoring",
+        "module": "cdk8s_dynatrace-monitoring"
       },
       "dotnet": {
-        "namespace": "Net.MihalyFarkas.DynatraceKubernetesMonitoring",
-        "packageId": "Net.MihalyFarkas.DynatraceKubernetesMonitoring"
+        "namespace": "Net.MihalyFarkas.DynatraceMonitoring",
+        "packageId": "Net.MihalyFarkas.DynatraceMonitoring"
       },
       "go": {
-        "moduleName": "github.com/mihaly-farkas/cdk8s-dynatrace-kubernetes-monitoring-go"
+        "moduleName": "github.com/mihaly-farkas/cdk8s-dynatrace-monitoring-go"
       }
     },
     "tsc": {
