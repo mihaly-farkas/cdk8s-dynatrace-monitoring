@@ -420,4 +420,30 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
       expect(warn).not.toHaveBeenCalled();
     });
   });
+
+  describe.each([
+    ['example-1', false],
+    ['example-2', true],
+  ])('when configured with skip cert check (%s)', (dataSetName: string, skipCertCheck: boolean) => {
+
+    it('must produce a manifest with the given values.', () => {
+      const warn = mockWarn();
+
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: defaultDeploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+          skipCertCheck,
+        },
+        snapshotFileComment: `The value of the skip cert check must be ${skipCertCheck}.`,
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/skip-cert-check.${dataSetName}.yaml`);
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
 });
