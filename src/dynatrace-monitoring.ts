@@ -250,6 +250,11 @@ export interface DynatraceMonitoringProps {
    * @default false
    */
   readonly skipNamespaceCreation?: boolean;
+
+  /**
+   * TODO add JSDoc for this property
+   */
+  readonly skipCertCheck?: boolean;
 }
 
 /**
@@ -384,10 +389,6 @@ export class DynatraceMonitoring extends Construct {
         },
       },
       spec: {
-        apiUrl: this.props.apiUrl,
-        metadataEnrichment: {
-          enabled: true,
-        },
         activeGate: {
           capabilities: Array.from(new Set([
             'kubernetes-monitoring',
@@ -412,27 +413,34 @@ export class DynatraceMonitoring extends Construct {
             },
           ],
         },
-        ...(this.props.deploymentOption === DeploymentOption.APPLICATION && {
-          oneAgent: {applicationMonitoring: {}},
-        }),
-        ...(this.props.deploymentOption === DeploymentOption.FULL_STACK && {
+        apiUrl: this.props.apiUrl,
+        metadataEnrichment: {
+          enabled: true,
+        },
+        ...(this.isAdvancedDeployment() && {
           oneAgent: {
-            cloudNativeFullStack: {
-              tolerations: [
-                {
-                  key: 'node-role.kubernetes.io/master',
-                  operator: 'Exists',
-                  effect: 'NoSchedule',
-                },
-                {
-                  key: 'node-role.kubernetes.io/control-plane',
-                  operator: 'Exists',
-                  effect: 'NoSchedule',
-                },
-              ],
-            },
+            ...(this.props.deploymentOption === DeploymentOption.APPLICATION && {
+              applicationMonitoring: {},
+            }),
+            ...(this.props.deploymentOption === DeploymentOption.FULL_STACK && {
+              cloudNativeFullStack: {
+                tolerations: [
+                  {
+                    key: 'node-role.kubernetes.io/master',
+                    operator: 'Exists',
+                    effect: 'NoSchedule',
+                  },
+                  {
+                    key: 'node-role.kubernetes.io/control-plane',
+                    operator: 'Exists',
+                    effect: 'NoSchedule',
+                  },
+                ],
+              },
+            }),
           },
         }),
+        skipCertCheck: this.props.skipCertCheck,
       },
     });
   }
