@@ -1,11 +1,6 @@
-# The values in the namespace metadata must match the specified one.
 apiVersion: v1
 kind: Namespace
 metadata:
-  annotations:
-    custom-annotation-1: annotation-value-1
-  labels:
-    custom-label-1: label-value-1
   name: dynatrace
 spec: {}
 ---

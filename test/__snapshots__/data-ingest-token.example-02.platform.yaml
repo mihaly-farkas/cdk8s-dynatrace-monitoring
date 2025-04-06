@@ -1,5 +1,9 @@
-# Since the namespace creation is skipped, the custom namespace properties cannot be not be applied.
-# So, the expected manifest is practically the same as the one with the default properties only.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dynatrace
+spec: {}
+---
 apiVersion: v1
 kind: Secret
 metadata:

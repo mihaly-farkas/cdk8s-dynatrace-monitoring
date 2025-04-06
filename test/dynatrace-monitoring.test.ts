@@ -46,166 +46,9 @@ const testDynatraceMonitoring = (props: { constructProps: DynatraceMonitoringPro
 describe('The Dynatrace Kubernetes monitoring construct,', () => {
 
   describe.each([
-    ['platform-observability', DeploymentOption.PLATFORM],
-    ['application-observability', DeploymentOption.APPLICATION],
-    ['full-stack-observability', DeploymentOption.FULL_STACK],
-  ])('when configured with %s deployment option', (dataSetName: string, deploymentOption: DeploymentOption) => {
-
-    it('must produce a manifest same as the one published in Dynatrace docs.', () => {
-      const warn = mockWarn();
-
-      const manifest = testDynatraceMonitoring({
-        constructProps: {
-          deploymentOption: deploymentOption,
-          apiUrl: defaultApiUrl,
-          tokens: {
-            apiToken: defaultApiToken,
-          },
-        },
-        snapshotFileComment:
-          'Must match the manifest published in Dynatrace docs.\n' +
-          `https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/${dataSetName}#helm`,
-      });
-
-      // Assert
-      expect(manifest).toMatchFile(`${snapshotsDir}/default.${dataSetName}.yaml`);
-      expect(warn).not.toHaveBeenCalled();
-    });
-
-    describe('and with a host group', () => {
-
-      it('must produce a manifest with the given value.', () => {
-        const warn = mockWarn();
-
-        const manifest = testDynatraceMonitoring({
-          constructProps: {
-            deploymentOption: deploymentOption,
-            apiUrl: defaultApiUrl,
-            tokens: {
-              apiToken: defaultApiToken,
-            },
-            hostGroup: 'custom-host-group',
-          },
-          snapshotFileComment: 'The value of the host group must match the specified one.',
-        });
-
-        // Assert
-        expect(manifest).toMatchFile(`${snapshotsDir}/host-group.${dataSetName}.yaml`);
-        expect(warn).not.toHaveBeenCalled();
-      });
-    });
-  });
-
-  describe.each([
-    ['example-1', defaultApiUrl],
-    ['example-2', 'https://fd567567.live.dynatrace.com/api'],
-  ])('when configured with an API URL (%s)', (dataSetName: string, apiUrl: string) => {
-
-    it('must produce a manifest with the given value.', () => {
-      const warn = mockWarn();
-
-      const manifest = testDynatraceMonitoring({
-        constructProps: {
-          deploymentOption: defaultDeploymentOption,
-          apiUrl: apiUrl,
-          tokens: {
-            apiToken: defaultApiToken,
-          },
-        },
-        snapshotFileComment: 'The value of the API URL must match the specified one.',
-      });
-
-      // Assert
-      expect(manifest).toMatchFile(`${snapshotsDir}/api-url.${dataSetName}.yaml`);
-      expect(warn).not.toHaveBeenCalled();
-    });
-  });
-
-  describe.each([
-    ['example-1', defaultApiToken],
-    ['example-2', '*** API TOKEN 2 ***'],
-  ])('when configured with an API token (%s)', (dataSetName: string, apiToken: string) => {
-
-    it('must produce a manifest with the given value.', () => {
-      const warn = mockWarn();
-
-      const manifest = testDynatraceMonitoring({
-        constructProps: {
-          deploymentOption: defaultDeploymentOption,
-          apiUrl: defaultApiUrl,
-          tokens: {
-            apiToken: apiToken,
-          },
-        },
-        snapshotFileComment: 'The value of the API token must match the specified one.',
-      });
-
-      // Assert
-      expect(manifest).toMatchFile(`${snapshotsDir}/api-token.${dataSetName}.yaml`);
-      expect(warn).not.toHaveBeenCalled();
-    });
-  });
-
-  describe.each([
-    ['example-1', DeploymentOption.PLATFORM, '*** DATA INGEST TOKEN 1 ***'],
-    ['example-2', DeploymentOption.PLATFORM, '*** DATA INGEST TOKEN 2 ***'],
-  ])('when configured with a data ingest token (%s)', (dataSetName: string, deploymentOption: DeploymentOption, dataIngestToken: string) => {
-
-    it('must produce a manifest with the given value.', () => {
-      const warn = mockWarn();
-
-      const manifest = testDynatraceMonitoring({
-        constructProps: {
-          deploymentOption: deploymentOption,
-          apiUrl: defaultApiUrl,
-          tokens: {
-            apiToken: defaultApiToken,
-            dataIngestToken,
-          },
-        },
-        snapshotFileComment:
-          'In the case of a platform deployment, the data ingest token is not applicable and therefore should not be set.\n' +
-          'So, the expected manifest is practically the same as the one with the default properties only.',
-      });
-
-      // Assert
-      expect(manifest).toMatchFile(`${snapshotsDir}/data-ingest-token.${dataSetName}.${deploymentOption}.yaml`);
-      expect(warn).toBeCalledWith('WARNING: Data ingest token is not supported for platform monitoring. It will be ignored.');
-    });
-  });
-
-  describe.each([
-    ['example-3', DeploymentOption.APPLICATION, '*** DATA INGEST TOKEN  1 ***'],
-    ['example-4', DeploymentOption.APPLICATION, '*** DATA INGEST TOKEN  2 ***'],
-    ['example-5', DeploymentOption.FULL_STACK, '*** DATA INGEST TOKEN  1 ***'],
-    ['example-6', DeploymentOption.FULL_STACK, '*** DATA INGEST TOKEN  2 ***'],
-  ])('when configured with a data ingest token (%s)', (dataSetName: string, deploymentOption: DeploymentOption, dataIngestToken: string) => {
-
-    it('must produce a manifest with the given value.', () => {
-      const warn = mockWarn();
-
-      const manifest = testDynatraceMonitoring({
-        constructProps: {
-          deploymentOption: deploymentOption,
-          apiUrl: defaultApiUrl,
-          tokens: {
-            apiToken: defaultApiToken,
-            dataIngestToken,
-          },
-        },
-        snapshotFileComment: 'The value of the data ingest token must match the specified one.',
-      });
-
-      // Assert
-      expect(manifest).toMatchFile(`${snapshotsDir}/data-ingest-token.${dataSetName}.${deploymentOption}.yaml`);
-      expect(warn).not.toHaveBeenCalled();
-    });
-  });
-
-  describe.each([
-    ['example-1', 'custom-namespace-1'],
-    ['example-2', 'custom-namespace-2'],
-  ])('when configured with custom namespace name (%s)', (dataSetName: string, namespaceName: string) => {
+    ['example-01', 'custom-namespace-1'],
+    ['example-02', 'custom-namespace-2'],
+  ])('when configured with a custom namespace name (%s)', (dataSetName: string, namespaceName: string) => {
 
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
@@ -229,9 +72,9 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
   });
 
   describe.each([
-    ['example-1', {annotations: {'custom-annotation-1': 'annotation-value-1'}, labels: {'custom-label-1': 'label-value-1'}}],
-    ['example-2', {annotations: {'custom-annotation-2': 'annotation-value-2'}, labels: {'custom-label-2': 'label-value-2'}}],
-  ])('when configured with custom namespace props (%s)', (dataSetName: string, namespaceProps: MetadataProps) => {
+    ['example-01', {annotations: {'custom-annotation-1': 'annotation-value-1'}, labels: {'custom-label-1': 'label-value-1'}}],
+    ['example-02', {annotations: {'custom-annotation-2': 'annotation-value-2'}, labels: {'custom-label-2': 'label-value-2'}}],
+  ])('when configured with a custom namespace props (%s)', (dataSetName: string, namespaceProps: MetadataProps) => {
 
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
@@ -245,7 +88,6 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
           },
           namespaceProps,
         },
-        snapshotFileComment: 'The values in the namespace metadata must match the specified one.',
       });
 
       // Assert
@@ -254,7 +96,69 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
     });
   });
 
-  describe('when configured with skip namespace creation', () => {
+  describe.each([
+    ['example-01', DeploymentOption.PLATFORM, '*** DATA INGEST TOKEN 1 ***', 'WARNING: Data ingest token is not supported for platform monitoring. It will be ignored.'],
+    ['example-02', DeploymentOption.PLATFORM, '*** DATA INGEST TOKEN 2 ***', 'WARNING: Data ingest token is not supported for platform monitoring. It will be ignored.'],
+    ['example-03', DeploymentOption.APPLICATION, '*** DATA INGEST TOKEN  1 ***'],
+    ['example-04', DeploymentOption.APPLICATION, '*** DATA INGEST TOKEN  2 ***'],
+    ['example-05', DeploymentOption.FULL_STACK, '*** DATA INGEST TOKEN  1 ***'],
+    ['example-06', DeploymentOption.FULL_STACK, '*** DATA INGEST TOKEN  2 ***'],
+  ])('when configured with a data ingest token (%s)', (dataSetName: string, deploymentOption: DeploymentOption, dataIngestToken: string, expectedWarning?: string) => {
+
+    it('must produce a manifest with the given value.', () => {
+      const warn = mockWarn();
+
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: deploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+            dataIngestToken,
+          },
+        },
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/data-ingest-token.${dataSetName}.${deploymentOption}.yaml`);
+      if (expectedWarning) {
+        expect(warn).toBeCalledWith(expectedWarning);
+      } else {
+        expect(warn).not.toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe.each([
+    ['example-01', DeploymentOption.PLATFORM, 'custom-host-group'],
+    ['example-02', DeploymentOption.APPLICATION, 'custom-host-group'],
+    ['example-03', DeploymentOption.FULL_STACK, 'custom-host-group'],
+  ])('when configured with a host group (%s)', (dataSetName: string, deploymentOption: DeploymentOption, hostGroup: string) => {
+
+    it('must produce a manifest with the given value.', () => {
+      const warn = mockWarn();
+
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: deploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+          hostGroup: hostGroup,
+        },
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/host-group.${dataSetName}.yaml`);
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe.each([
+    ['example-01', defaultApiToken],
+    ['example-02', '*** API TOKEN 2 ***'],
+  ])('when configured with an API token (%s)', (dataSetName: string, apiToken: string) => {
 
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
@@ -264,80 +168,53 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
           deploymentOption: defaultDeploymentOption,
           apiUrl: defaultApiUrl,
           tokens: {
-            apiToken: defaultApiToken,
+            apiToken: apiToken,
           },
-          skipNamespaceCreation: true,
         },
-        snapshotFileComment: 'Since namespace creation is disabled, the manifest must not include the namespace.',
+        snapshotFileComment: 'The value of the API token must match the specified one.',
       });
 
       // Assert
-      expect(manifest).toMatchFile(`${snapshotsDir}/skip-namespace-creation.default.yaml`);
+      expect(manifest).toMatchFile(`${snapshotsDir}/api-token.${dataSetName}.yaml`);
       expect(warn).not.toHaveBeenCalled();
-    });
-
-    describe('and with custom namespace name', () => {
-      it('must produce a manifest with the given value.', () => {
-        const manifest = testDynatraceMonitoring({
-          constructProps: {
-            deploymentOption: defaultDeploymentOption,
-            apiUrl: defaultApiUrl,
-            tokens: {
-              apiToken: defaultApiToken,
-            },
-            namespaceName: 'custom-namespace',
-            skipNamespaceCreation: true,
-          },
-        });
-
-        // Assert
-        expect(manifest).toMatchFile(`${snapshotsDir}/skip-namespace-creation.custom-namespace.yaml`);
-      });
-    });
-
-    describe('and with custom namespace props', () => {
-      it('must produce a manifest with the given value.', () => {
-        const warn = mockWarn();
-
-        const manifest = testDynatraceMonitoring({
-          constructProps: {
-            deploymentOption: defaultDeploymentOption,
-            apiUrl: defaultApiUrl,
-            tokens: {
-              apiToken: defaultApiToken,
-            },
-            skipNamespaceCreation: true,
-            namespaceProps: {
-              annotations: {
-                'custom-annotation': 'value',
-              },
-              labels: {
-                'custom-label': 'value',
-              },
-            },
-          },
-          snapshotFileComment:
-            'Since the namespace creation is skipped, the custom namespace properties cannot be not be applied.\n' +
-            'So, the expected manifest is practically the same as the one with the default properties only.',
-        });
-
-        // Assert
-        expect(manifest).toMatchFile(`${snapshotsDir}/skip-namespace-creation.custom-namespace-props.yaml`);
-        expect(warn).toBeCalledWith('WARNING: Namespace creation is skipped. Custom namespace properties will not be applied.');
-      });
     });
   });
 
   describe.each([
-    ['example-1', {cpu: {request: Cpu.millis(100)}}],
-    ['example-2', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}}],
-    ['example-3', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256)}}],
-    ['example-4', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256), limit: Size.gibibytes(1)}}],
-    ['example-5', {cpu: {request: 0.1, limit: '200m'}}],
-    ['example-6', {cpu: {request: 0.5, limit: 1}}],
-    ['example-7', {cpu: {request: 1.5, limit: 1.9}}],
-    ['example-8', {memory: {request: 1024, limit: '1Gi'}}],
-  ])('when configured with custom resources (%s)', (dataSetName: string, resources: DynatraceContainerResources) => {
+    ['example-01', defaultApiUrl],
+    ['example-02', 'https://fd567567.live.dynatrace.com/api'],
+  ])('when configured with an API URL (%s)', (dataSetName: string, apiUrl: string) => {
+
+    it('must produce a manifest with the given value.', () => {
+      const warn = mockWarn();
+
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: defaultDeploymentOption,
+          apiUrl: apiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+        },
+        snapshotFileComment: 'The value of the API URL must match the specified one.',
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/api-url.${dataSetName}.yaml`);
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe.each([
+    ['example-01', {cpu: {request: Cpu.millis(100)}}],
+    ['example-02', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}}],
+    ['example-03', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256)}}],
+    ['example-04', {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256), limit: Size.gibibytes(1)}}],
+    ['example-05', {cpu: {request: 0.1, limit: '200m'}}],
+    ['example-06', {cpu: {request: 0.5, limit: 1}}],
+    ['example-07', {cpu: {request: 1.5, limit: 1.9}}],
+    ['example-08', {memory: {request: 1024, limit: '1Gi'}}],
+  ])('when configured with custom ActiveGate resources (%s)', (dataSetName: string, resources: DynatraceContainerResources) => {
 
     it('must produce a manifest with the given value.', () => {
       const warn = mockWarn();
@@ -353,7 +230,7 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
             resources,
           },
         },
-        snapshotFileComment: 'The values in the active gate resources must match the specified ones.',
+        snapshotFileComment: 'The values in the ActiveGate resources must match the specified ones.',
       });
 
       // Assert
@@ -363,9 +240,9 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
   });
 
   describe.each([
-    ['example-1', [DynatraceCapability.DYNATRACE_API]],
-    ['example-2', [DynatraceCapability.DYNATRACE_API, DynatraceCapability.METRICS_INGEST]],
-    ['example-3', [DynatraceCapability.DYNATRACE_API, DynatraceCapability.DYNATRACE_API, DynatraceCapability.METRICS_INGEST, DynatraceCapability.METRICS_INGEST]],
+    ['example-01', [DynatraceCapability.DYNATRACE_API]],
+    ['example-02', [DynatraceCapability.DYNATRACE_API, DynatraceCapability.METRICS_INGEST]],
+    ['example-03', [DynatraceCapability.DYNATRACE_API, DynatraceCapability.DYNATRACE_API, DynatraceCapability.METRICS_INGEST, DynatraceCapability.METRICS_INGEST]],
   ])('when configured with custom capabilities (%s)', (dataSetName: string, capabilities: DynatraceCapability[]) => {
 
     it('must produce a manifest with the given values.', () => {
@@ -392,8 +269,47 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
   });
 
   describe.each([
-    ['example-1', false],
-    ['example-2', true],
+    ['example-01', DeploymentOption.PLATFORM, {cpu: {request: Cpu.millis(100)}}, 'WARNING: OneAgent resources are only applicable for FULL_STACK deployment option. They will be ignored.'],
+    ['example-02', DeploymentOption.APPLICATION, {cpu: {request: Cpu.millis(100)}}, 'WARNING: OneAgent resources are only applicable for FULL_STACK deployment option. They will be ignored.'],
+    ['example-03', DeploymentOption.FULL_STACK, {cpu: {request: Cpu.millis(100)}}],
+    ['example-04', DeploymentOption.FULL_STACK, {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}}],
+    ['example-05', DeploymentOption.FULL_STACK, {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256)}}],
+    ['example-06', DeploymentOption.FULL_STACK, {cpu: {request: Cpu.millis(100), limit: Cpu.millis(200)}, memory: {request: Size.mebibytes(256), limit: Size.gibibytes(1)}}],
+    ['example-07', DeploymentOption.FULL_STACK, {cpu: {request: 0.1, limit: '200m'}}],
+    ['example-08', DeploymentOption.FULL_STACK, {cpu: {request: 0.5, limit: 1}}],
+    ['example-09', DeploymentOption.FULL_STACK, {cpu: {request: 1.5, limit: 1.9}}],
+    ['example-10', DeploymentOption.FULL_STACK, {memory: {request: 1024, limit: '1Gi'}}],
+  ])('when configured with custom OneAgent resources (%s)', (dataSetName: string, deploymentOption: DeploymentOption, resources: DynatraceContainerResources, expectedWarning?: string) => {
+
+    it('must produce a manifest with the given value.', () => {
+      const warn = mockWarn();
+
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: deploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+          oneAgent: {
+            resources,
+          },
+        },
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/custom-one-agent-resources.${dataSetName}.yaml`);
+      if (expectedWarning) {
+        expect(warn).toBeCalledWith(expectedWarning);
+      } else {
+        expect(warn).not.toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe.each([
+    ['example-01', false],
+    ['example-02', true],
   ])('when configured with skip cert check (%s)', (dataSetName: string, skipCertCheck: boolean) => {
 
     it('must produce a manifest with the given values.', () => {
@@ -408,11 +324,72 @@ describe('The Dynatrace Kubernetes monitoring construct,', () => {
           },
           skipCertCheck,
         },
-        snapshotFileComment: `The value of the skip cert check must be ${skipCertCheck}.`,
       });
 
       // Assert
       expect(manifest).toMatchFile(`${snapshotsDir}/skip-cert-check.${dataSetName}.yaml`);
+      expect(warn).not.toHaveBeenCalled();
+    });
+  });
+
+  describe.each([
+    ['example-01', undefined],
+    ['example-02', false],
+    ['example-03', true],
+    ['example-04', true, 'custom-namespace-name'],
+    ['example-05', true, undefined, {}, 'WARNING: Namespace creation is skipped. Custom namespace properties will not be applied.'],
+  ])('when configured with skip namespace creation', (dataSetName: string, skipNamespaceCreation?: boolean, namespaceName?: string, namespaceProps?: MetadataProps, expectedWaring?: string) => {
+
+    it('must produce the manifest based on the given value.', () => {
+      const warn = mockWarn();
+
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: defaultDeploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+          skipNamespaceCreation: skipNamespaceCreation,
+          namespaceName: namespaceName,
+          namespaceProps: namespaceProps,
+        },
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/skip-namespace-creation.${dataSetName}.yaml`);
+      if (expectedWaring) {
+        expect(warn).toBeCalledWith(expectedWaring);
+      } else {
+        expect(warn).not.toHaveBeenCalled();
+      }
+    });
+  });
+
+  describe.each([
+    ['platform-observability', DeploymentOption.PLATFORM],
+    ['application-observability', DeploymentOption.APPLICATION],
+    ['full-stack-observability', DeploymentOption.FULL_STACK],
+  ])('when configured with the %s deployment option', (dataSetName: string, deploymentOption: DeploymentOption) => {
+
+    it('must produce a manifest same as the one published in Dynatrace docs.', () => {
+      const warn = mockWarn();
+
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: deploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
+          },
+        },
+        snapshotFileComment:
+          'Must match the manifest published in Dynatrace docs.\n' +
+          `https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/${dataSetName}#helm`,
+      });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/default.${dataSetName}.yaml`);
       expect(warn).not.toHaveBeenCalled();
     });
   });

@@ -1,4 +1,3 @@
-# The values in the active gate resources must match the specified ones.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -19,6 +18,7 @@ apiVersion: dynatrace.com/v1beta3
 kind: DynaKube
 metadata:
   annotations:
+    feature.dynatrace.com/injection-readonly-volume: 'true'
     feature.dynatrace.com/k8s-app-enabled: 'true'
   name: dynakube
   namespace: dynatrace
@@ -26,12 +26,13 @@ spec:
   activeGate:
     capabilities:
       - kubernetes-monitoring
+      - routing
     resources:
       limits:
-        cpu: 200m
+        cpu: 1000m
         memory: 1.5Gi
       requests:
-        cpu: 100m
+        cpu: 500m
         memory: 512Mi
     tolerations:
       - effect: NoSchedule
@@ -40,3 +41,13 @@ spec:
   apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
   metadataEnrichment:
     enabled: true
+  oneAgent:
+    cloudNativeFullStack:
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+    hostGroup: custom-host-group

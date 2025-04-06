@@ -1,4 +1,4 @@
-# The value of the data ingest token must match the specified one.
+# The values in the ActiveGate resources must match the specified ones.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -13,14 +13,12 @@ metadata:
 immutable: false
 stringData:
   apiToken: '*** API TOKEN 1 ***'
-  dataIngestToken: '*** DATA INGEST TOKEN  2 ***'
 type: Opaque
 ---
 apiVersion: dynatrace.com/v1beta3
 kind: DynaKube
 metadata:
   annotations:
-    feature.dynatrace.com/injection-readonly-volume: 'true'
     feature.dynatrace.com/k8s-app-enabled: 'true'
   name: dynakube
   namespace: dynatrace
@@ -28,13 +26,12 @@ spec:
   activeGate:
     capabilities:
       - kubernetes-monitoring
-      - routing
     resources:
       limits:
-        cpu: 1000m
+        cpu: 1.9
         memory: 1.5Gi
       requests:
-        cpu: 500m
+        cpu: 1.5
         memory: 512Mi
     tolerations:
       - effect: NoSchedule
@@ -43,12 +40,3 @@ spec:
   apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
   metadataEnrichment:
     enabled: true
-  oneAgent:
-    cloudNativeFullStack:
-      tolerations:
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/master
-          operator: Exists
-        - effect: NoSchedule
-          key: node-role.kubernetes.io/control-plane
-          operator: Exists

@@ -1,11 +1,7 @@
-# The values in the namespace metadata must match the specified one.
+# The values in the ActiveGate resources must match the specified ones.
 apiVersion: v1
 kind: Namespace
 metadata:
-  annotations:
-    custom-annotation-2: annotation-value-2
-  labels:
-    custom-label-2: label-value-2
   name: dynatrace
 spec: {}
 ---
@@ -32,10 +28,10 @@ spec:
       - kubernetes-monitoring
     resources:
       limits:
-        cpu: 1000m
+        cpu: 200m
         memory: 1.5Gi
       requests:
-        cpu: 500m
+        cpu: 0.1
         memory: 512Mi
     tolerations:
       - effect: NoSchedule

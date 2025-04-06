@@ -1,4 +1,3 @@
-# The value of the host group must match the specified one.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -44,6 +43,13 @@ spec:
     enabled: true
   oneAgent:
     cloudNativeFullStack:
+      oneAgentResources:
+        limits:
+          cpu: 200m
+          memory: 1.5Gi
+        requests:
+          cpu: 100m
+          memory: 256Mi
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/master
@@ -51,4 +57,3 @@ spec:
         - effect: NoSchedule
           key: node-role.kubernetes.io/control-plane
           operator: Exists
-    hostGroup: custom-host-group

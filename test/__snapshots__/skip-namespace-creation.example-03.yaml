@@ -1,10 +1,3 @@
-# The value of the skip cert check must be true.
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: dynatrace
-spec: {}
----
 apiVersion: v1
 kind: Secret
 metadata:
@@ -40,4 +33,3 @@ spec:
   apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
   metadataEnrichment:
     enabled: true
-  skipCertCheck: true

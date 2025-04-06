@@ -1,4 +1,4 @@
-# The values in the active gate resources must match the specified ones.
+# The values in the ActiveGate resources must match the specified ones.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -29,10 +29,10 @@ spec:
     resources:
       limits:
         cpu: 1000m
-        memory: 1.5Gi
+        memory: 1Gi
       requests:
-        cpu: 100m
-        memory: 512Mi
+        cpu: 500m
+        memory: 1024
     tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
