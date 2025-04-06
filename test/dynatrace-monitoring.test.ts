@@ -45,82 +45,52 @@ const testDynatraceMonitoring = (props: { constructProps: DynatraceMonitoringPro
 
 describe('The Dynatrace Kubernetes monitoring construct,', () => {
 
-  describe('when configured with platform monitoring', () => {
+  describe.each([
+    ['platform-observability', DeploymentOption.PLATFORM],
+    ['application-observability', DeploymentOption.APPLICATION],
+    ['full-stack-observability', DeploymentOption.FULL_STACK],
+  ])('when configured with %s deployment option', (dataSetName: string, deploymentOption: DeploymentOption) => {
 
-    describe('and only the required parameters,', () => {
+    it('must produce a manifest same as the one published in Dynatrace docs.', () => {
+      const warn = mockWarn();
 
-      it('must produce a manifest identical to the one published on the Dynatrace website.', () => {
-        const warn = mockWarn();
-
-        const manifest = testDynatraceMonitoring({
-          constructProps: {
-            deploymentOption: DeploymentOption.PLATFORM,
-            apiUrl: defaultApiUrl,
-            tokens: {
-              apiToken: defaultApiToken,
-            },
+      const manifest = testDynatraceMonitoring({
+        constructProps: {
+          deploymentOption: deploymentOption,
+          apiUrl: defaultApiUrl,
+          tokens: {
+            apiToken: defaultApiToken,
           },
-          snapshotFileComment:
-            'Must match the manifest published in Dynatrace docs.\n' +
-            'https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/platform-observability#helm',
-        });
-
-        // Assert
-        expect(manifest).toMatchFile(`${snapshotsDir}/default.platform-monitoring.yaml`);
-        expect(warn).not.toHaveBeenCalled();
+        },
+        snapshotFileComment:
+          'Must match the manifest published in Dynatrace docs.\n' +
+          `https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/${dataSetName}#helm`,
       });
+
+      // Assert
+      expect(manifest).toMatchFile(`${snapshotsDir}/default.${dataSetName}.yaml`);
+      expect(warn).not.toHaveBeenCalled();
     });
-  });
 
-  describe('when configured with platform monitoring + application observability', () => {
+    describe('and with a host group', () => {
 
-    describe('and only the required parameters,', () => {
-
-      it('must produce a manifest identical to the one published on the Dynatrace website.', () => {
+      it('must produce a manifest with the given value.', () => {
         const warn = mockWarn();
 
         const manifest = testDynatraceMonitoring({
           constructProps: {
-            deploymentOption: DeploymentOption.APPLICATION,
+            deploymentOption: deploymentOption,
             apiUrl: defaultApiUrl,
             tokens: {
               apiToken: defaultApiToken,
             },
+            hostGroup: 'custom-host-group',
           },
-          snapshotFileComment:
-            'Must match the manifest published in Dynatrace docs.\n' +
-            'https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/application-observability#helm',
+          snapshotFileComment: 'The value of the host group must match the specified one.',
         });
 
         // Assert
-        expect(manifest).toMatchFile(`${snapshotsDir}/default.application-monitoring.yaml`);
-        expect(warn).not.toHaveBeenCalled();
-      });
-    });
-  });
-
-  describe('when configured with platform monitoring + full-stack observability', () => {
-
-    describe('and only the required parameters,', () => {
-
-      it('must produce a manifest identical to the one published on the Dynatrace website.', () => {
-        const warn = mockWarn();
-
-        const manifest = testDynatraceMonitoring({
-          constructProps: {
-            deploymentOption: DeploymentOption.FULL_STACK,
-            apiUrl: defaultApiUrl,
-            tokens: {
-              apiToken: defaultApiToken,
-            },
-          },
-          snapshotFileComment:
-            'Must match the manifest published in Dynatrace docs.\n' +
-            'https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment/application-observability#helm',
-        });
-
-        // Assert
-        expect(manifest).toMatchFile(`${snapshotsDir}/default.full-stack-monitoring.yaml`);
+        expect(manifest).toMatchFile(`${snapshotsDir}/host-group.${dataSetName}.yaml`);
         expect(warn).not.toHaveBeenCalled();
       });
     });

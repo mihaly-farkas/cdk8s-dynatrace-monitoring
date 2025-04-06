@@ -89,7 +89,7 @@ export interface DynatraceCpuResources {
  * Memory resource configuration.
  *
  * For valid values and units of measurement, refer to the corresponding
- * [CPU resource units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-cpu)
+ * [Memory resource units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
  * documentation.
  */
 export interface DynatraceMemoryResources {
@@ -223,6 +223,20 @@ export interface DynatraceMonitoringProps {
    */
   readonly deploymentOption: DeploymentOption;
 
+  /**
+   * Optional host group name to assign to monitored hosts.
+   *
+   * Host groups are used in Dynatrace to logically group and manage hosts for easier configuration and monitoring.
+   * This is especially useful for applying targeted settings, such as naming rules, management zones, etc.
+   *
+   * If specified, the value will be passed to the Dynatrace operator to tag the hosts accordingly.
+   *
+   * For more details, refer to the Dynatrace documentation:
+   * [Organize your environment using host groups](https://docs.dynatrace.com/docs/observe/infrastructure-monitoring/hosts/configuration/organize-your-environment-using-host-groups)
+   *
+   * @default undefined
+   */
+  readonly hostGroup?: string;
 
   /**
    * The name of the Kubernetes namespace the Dynatrace resources to deploy to.
@@ -424,7 +438,7 @@ export class DynatraceMonitoring extends Construct {
         metadataEnrichment: {
           enabled: true,
         },
-        ...(this.isAdvancedDeployment() && {
+        ...((this.isAdvancedDeployment() || this.props.hostGroup) && {
           oneAgent: {
             ...(this.props.deploymentOption === DeploymentOption.APPLICATION && {
               applicationMonitoring: {},
@@ -445,6 +459,7 @@ export class DynatraceMonitoring extends Construct {
                 ],
               },
             }),
+            hostGroup: this.props.hostGroup,
           },
         }),
         skipCertCheck: this.props.skipCertCheck,
