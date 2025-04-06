@@ -1,6 +1,6 @@
 [![Continuous Integration](https://github.com/mihaly-farkas/cdk8s-dynatrace-monitoring/actions/workflows/continous-integration.yml/badge.svg)](https://github.com/mihaly-farkas/cdk8s-dynatrace-monitoring/actions/workflows/continous-integration.yml)
 [![CodeQL](https://github.com/mihaly-farkas/cdk8s-dynatrace-monitoring/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/mihaly-farkas/cdk8s-dynatrace-monitoring/actions/workflows/github-code-scanning/codeql)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mihaly-farkas_cdk8s-dynatrace-monitoring&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=mihaly-farkas_cdk8s-dynatrace-monitoring)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=mihaly-farkas_cdk8s-dynatrace-monitoring&metric=alert_status)](https://sonarcloud.io/summary/overall?id=mihaly-farkas_cdk8s-dynatrace-monitoring&branch=main)
 
 # cdk8s-dynatrace-monitoring
 
