@@ -75,14 +75,14 @@ export interface DynatraceTokens {
 export interface DynatraceCpuResources {
 
   /**
-   * CPU request value.
-   */
-  readonly request?: Cpu | string | number;
-
-  /**
    * CPU limit value.
    */
   readonly limit?: Cpu | string | number;
+
+  /**
+   * CPU request value.
+   */
+  readonly request?: Cpu | string | number;
 }
 
 /**
@@ -95,14 +95,14 @@ export interface DynatraceCpuResources {
 export interface DynatraceMemoryResources {
 
   /**
-   * Memory request value.
-   */
-  readonly request?: Size | string | number;
-
-  /**
    * Memory limit value.
    */
   readonly limit?: Size | string | number;
+
+  /**
+   * Memory request value.
+   */
+  readonly request?: Size | string | number;
 }
 
 /**
@@ -134,20 +134,20 @@ export interface DynatraceContainerResources {
 export enum DynatraceCapability {
 
   /**
-   * Enables the metrics ingest endpoint on ActiveGate and configures pods to redirect metrics to it.
-   *
-   * This capability is required for collecting Prometheus metrics or custom metrics from pods
-   * outside the Dynatrace namespace.
-   */
-  METRICS_INGEST = 'metrics-ingest',
-
-  /**
    * Enables the Dynatrace API endpoint on ActiveGate, allowing Kubernetes pods to interact with the Dynatrace API.
    *
    * This is required for scenarios where agents or services within the cluster need to push
    * or query data via the Dynatrace API through the ActiveGate.
    */
   DYNATRACE_API = 'dynatrace-api',
+
+  /**
+   * Enables the metrics ingest endpoint on ActiveGate and configures pods to redirect metrics to it.
+   *
+   * This capability is required for collecting Prometheus metrics or custom metrics from pods
+   * outside the Dynatrace namespace.
+   */
+  METRICS_INGEST = 'metrics-ingest',
 }
 
 /**
@@ -209,6 +209,11 @@ export enum DeploymentOption {
 export interface DynatraceMonitoringProps {
 
   /**
+   * Optional ActiveGate configuration.
+   */
+  readonly activeGate?: ActiveGateProps;
+
+  /**
    * Dynatrace API endpoint URL.
    */
   readonly apiUrl: string;
@@ -218,15 +223,6 @@ export interface DynatraceMonitoringProps {
    */
   readonly deploymentOption: DeploymentOption;
 
-  /**
-   * Dynatrace access tokens for authentication.
-   */
-  readonly tokens: DynatraceTokens;
-
-  /**
-   * Optional ActiveGate configuration.
-   */
-  readonly activeGate?: ActiveGateProps;
 
   /**
    * The name of the Kubernetes namespace the Dynatrace resources to deploy to.
@@ -242,6 +238,17 @@ export interface DynatraceMonitoringProps {
    */
   readonly namespaceProps?: MetadataProps;
 
+
+  /**
+   * Whether to skip SSL certificate validation for the Dynatrace API endpoint.
+   *
+   * This can be useful for testing or when using self-signed certificates, but is not recommended in production
+   * environments due to security concerns.
+   *
+   * @default false
+   */
+  readonly skipCertCheck?: boolean;
+
   /**
    * Whether to skip the creation of the Kubernetes namespace.
    *
@@ -252,9 +259,9 @@ export interface DynatraceMonitoringProps {
   readonly skipNamespaceCreation?: boolean;
 
   /**
-   * TODO add JSDoc for this property
+   * Dynatrace access tokens for authentication.
    */
-  readonly skipCertCheck?: boolean;
+  readonly tokens: DynatraceTokens;
 }
 
 /**
