@@ -1,4 +1,3 @@
-# The values in the active gate resources must match the specified ones.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -28,11 +27,11 @@ spec:
       - kubernetes-monitoring
     resources:
       limits:
-        cpu: 200m
+        cpu: 1000m
         memory: 1.5Gi
       requests:
-        cpu: 100m
-        memory: 256Mi
+        cpu: 500m
+        memory: 512Mi
     tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master

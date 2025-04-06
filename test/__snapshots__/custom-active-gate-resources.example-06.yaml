@@ -1,4 +1,4 @@
-# The value of the host group must match the specified one.
+# The values in the ActiveGate resources must match the specified ones.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -28,10 +28,10 @@ spec:
       - kubernetes-monitoring
     resources:
       limits:
-        cpu: 1000m
+        cpu: 1
         memory: 1.5Gi
       requests:
-        cpu: 500m
+        cpu: 0.5
         memory: 512Mi
     tolerations:
       - effect: NoSchedule
@@ -40,5 +40,3 @@ spec:
   apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
   metadataEnrichment:
     enabled: true
-  oneAgent:
-    hostGroup: custom-host-group

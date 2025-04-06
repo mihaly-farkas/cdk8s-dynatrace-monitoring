@@ -1,15 +1,8 @@
-# The values in the active gate resources must match the specified ones.
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: dynatrace
-spec: {}
----
 apiVersion: v1
 kind: Secret
 metadata:
   name: dynakube
-  namespace: dynatrace
+  namespace: custom-namespace-name
 immutable: false
 stringData:
   apiToken: '*** API TOKEN 1 ***'
@@ -21,7 +14,7 @@ metadata:
   annotations:
     feature.dynatrace.com/k8s-app-enabled: 'true'
   name: dynakube
-  namespace: dynatrace
+  namespace: custom-namespace-name
 spec:
   activeGate:
     capabilities:
@@ -29,10 +22,10 @@ spec:
     resources:
       limits:
         cpu: 1000m
-        memory: 1Gi
+        memory: 1.5Gi
       requests:
         cpu: 500m
-        memory: 1024
+        memory: 512Mi
     tolerations:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master

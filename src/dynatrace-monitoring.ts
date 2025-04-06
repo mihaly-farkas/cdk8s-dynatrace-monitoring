@@ -16,6 +16,10 @@ import {
   DEFAULT_ACTIVE_GATE_MEMORY_REQUEST,
   DEFAULT_DYNA_KUBE_NAME,
   DEFAULT_NAMESPACE,
+  DEFAULT_ONE_AGENT_CPU_LIMIT,
+  DEFAULT_ONE_AGENT_CPU_REQUEST,
+  DEFAULT_ONE_AGENT_MEMORY_LIMIT,
+  DEFAULT_ONE_AGENT_MEMORY_REQUEST,
 } from './constants';
 
 /**
@@ -178,6 +182,22 @@ export interface ActiveGateProps {
 }
 
 /**
+ * Properties related to OneAgent configuration in Dynatrace.
+ */
+export interface OneAgentProps {
+
+  /**
+   * CPU and memory resource configurations for the OneAgent pod(s).
+   *
+   * Resource limits and requests help control how much compute and memory is allocated to OneAgent.
+   * Adjust these values based on your expected load and cluster resource availability.
+   *
+   * @default Uses predefined default values suitable for most workloads.
+   */
+  resources?: DynatraceContainerResources;
+}
+
+/**
  * Specifies the deployment and observability options.
  *
  * The options have different capabilities, licensing, pricing, etc.
@@ -252,6 +272,10 @@ export interface DynatraceMonitoringProps {
    */
   readonly namespaceProps?: MetadataProps;
 
+  /**
+   * Optional resource settings for OneAgent in full-stack mode.
+   */
+  readonly oneAgent?: OneAgentProps;
 
   /**
    * Whether to skip SSL certificate validation for the Dynatrace API endpoint.
@@ -401,6 +425,13 @@ export class DynatraceMonitoring extends Construct {
     const activeGateCpu = this.props.activeGate?.resources?.cpu;
     const activeGateMemory = this.props.activeGate?.resources?.memory;
 
+    if (this.props.oneAgent?.resources && this.props.deploymentOption !== DeploymentOption.FULL_STACK) {
+      console.warn('WARNING: OneAgent resources are only applicable for FULL_STACK deployment option. They will be ignored.');
+    }
+
+    const oneAgentCpu = this.props.oneAgent?.resources?.cpu;
+    const oneAgentMemory = this.props.oneAgent?.resources?.memory;
+
     return new DynaKubeV1Beta3(this, 'DynaKube', {
       metadata: {
         ...this.getNameAndNamespaceMetadata(),
@@ -445,6 +476,18 @@ export class DynatraceMonitoring extends Construct {
             }),
             ...(this.props.deploymentOption === DeploymentOption.FULL_STACK && {
               cloudNativeFullStack: {
+                ...((oneAgentCpu || oneAgentMemory) && {
+                  oneAgentResources: {
+                    requests: {
+                      ...this.parseResourceRequest('cpu', oneAgentCpu?.request, DEFAULT_ONE_AGENT_CPU_REQUEST),
+                      ...this.parseResourceRequest('memory', oneAgentMemory?.request, DEFAULT_ONE_AGENT_MEMORY_REQUEST),
+                    },
+                    limits: {
+                      ...this.parseResourceRequest('cpu', oneAgentCpu?.limit, DEFAULT_ONE_AGENT_CPU_LIMIT),
+                      ...this.parseResourceRequest('memory', oneAgentMemory?.limit, DEFAULT_ONE_AGENT_MEMORY_LIMIT),
+                    },
+                  },
+                }),
                 tolerations: [
                   {
                     key: 'node-role.kubernetes.io/master',

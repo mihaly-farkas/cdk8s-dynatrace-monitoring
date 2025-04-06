@@ -1,8 +1,14 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: dynatrace
+spec: {}
+---
+apiVersion: v1
 kind: Secret
 metadata:
   name: dynakube
-  namespace: custom-namespace
+  namespace: dynatrace
 immutable: false
 stringData:
   apiToken: '*** API TOKEN 1 ***'
@@ -12,13 +18,15 @@ apiVersion: dynatrace.com/v1beta3
 kind: DynaKube
 metadata:
   annotations:
+    feature.dynatrace.com/injection-readonly-volume: 'true'
     feature.dynatrace.com/k8s-app-enabled: 'true'
   name: dynakube
-  namespace: custom-namespace
+  namespace: dynatrace
 spec:
   activeGate:
     capabilities:
       - kubernetes-monitoring
+      - routing
     resources:
       limits:
         cpu: 1000m
@@ -33,3 +41,5 @@ spec:
   apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
   metadataEnrichment:
     enabled: true
+  oneAgent:
+    applicationMonitoring: {}

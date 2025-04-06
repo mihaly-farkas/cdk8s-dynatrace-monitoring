@@ -1,4 +1,3 @@
-# The values in the active gate resources must match the specified ones.
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -28,10 +27,10 @@ spec:
       - kubernetes-monitoring
     resources:
       limits:
-        cpu: 1
+        cpu: 1000m
         memory: 1.5Gi
       requests:
-        cpu: 0.5
+        cpu: 500m
         memory: 512Mi
     tolerations:
       - effect: NoSchedule
@@ -40,3 +39,4 @@ spec:
   apiUrl: https://ENVIRONMENTID.live.dynatrace.com/api
   metadataEnrichment:
     enabled: true
+  skipCertCheck: false
