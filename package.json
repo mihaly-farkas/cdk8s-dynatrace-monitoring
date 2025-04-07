@@ -9,7 +9,7 @@
     "kubernetes",
     "observability"
   ],
-  "version": "0.1.0-alpha.16",
+  "version": "0.1.0-alpha.17",
   "repository": {
     "type": "git",
     "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-monitoring.git"
@@ -53,7 +53,8 @@
   "dependencies": {
     "cdk8s": "^2.69.60",
     "cdk8s-imports": "./imports",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.0",
+    "sort-keys-recursive": "^2.1.10"
   },
   "devDependencies": {
     "@sonar/scan": "^4.3.0",

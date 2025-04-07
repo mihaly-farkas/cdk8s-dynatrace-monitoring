@@ -1,10 +1,4 @@
 /**
- * @fileoverview This file contains constants necessary for Dynatrace Kubernetes monitoring.
- *
- * @module cdk8s-dynatrace-monitoring
- */
-
-/**
  * The default name for the DynaKube custom resource.
  *
  * DynaKube is the primary resource for configuring and managing Dynatrace monitoring on Kubernetes clusters.

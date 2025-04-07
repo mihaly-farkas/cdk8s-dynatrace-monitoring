@@ -1,14 +1,9 @@
-/**
- * @fileoverview This module defines a CDK8s construct for deploying Dynatrace monitoring resources to a Kubernetes
- * cluster.
- *
- * @module cdk8s-dynatrace-monitoring
- */
-
-import { ApiObjectMetadata, Size } from 'cdk8s';
+import { Construct } from 'constructs';
+import { Size } from 'cdk8s';
 import { Cpu, Namespace, Secret } from 'cdk8s-plus-32';
 import { DynaKubeV1Beta3, DynaKubeV1Beta3SpecActiveGateResourcesRequests } from 'cdk8s-imports/dynatrace.com';
-import { Construct } from 'constructs';
+import { DeploymentOption } from './deployment-option';
+import { DynatraceMonitoringProps } from './dynatrace-monitoring-props';
 import {
   DEFAULT_ACTIVE_GATE_CPU_LIMIT,
   DEFAULT_ACTIVE_GATE_CPU_REQUEST,
@@ -16,291 +11,9 @@ import {
   DEFAULT_ACTIVE_GATE_MEMORY_REQUEST,
   DEFAULT_DYNA_KUBE_NAME,
   DEFAULT_NAMESPACE,
-  DEFAULT_ONE_AGENT_CPU_LIMIT,
-  DEFAULT_ONE_AGENT_CPU_REQUEST,
-  DEFAULT_ONE_AGENT_MEMORY_LIMIT,
-  DEFAULT_ONE_AGENT_MEMORY_REQUEST,
 } from './constants';
+import sortKeysRecursive from 'sort-keys-recursive';
 
-/**
- * A subset of Kubernetes metadata, excluding the `name` and `namespace`.
- *
- * The `name` and `namespace` are determined by the construct itself based on custom logic.
- * This class was created to avoid any confusion due to this behavior.
- * All other metadata fields will be passed unchanged to the underlying resources.
- */
-export type MetadataProps = Omit<ApiObjectMetadata, 'name' | 'namespace'>;
-
-/**
- * Dynatrace authentication tokens.
- */
-export interface DynatraceTokens {
-
-  /**
-   * Dynatrace API token (required).
-   *
-   * The API token is required for the Dynatrace operator to communicate with the Dynatrace platform.
-   * Ensure that the following scopes are enabled for your API token:
-   * - _Read settings_
-   * - _Write settings_
-   * - _Read entities_
-   * - _Installer download_
-   * - _Access problem and event feed, metrics, and topology_
-   * - _Create ActiveGate tokens_
-   *
-   * To create an API token, use the _Access Tokens_ page in the Dynatrace UI.
-   */
-  readonly apiToken: string;
-
-  /**
-   * Optional data ingest token for metrics, logs, and OpenTelemetry traces.
-   *
-   * This token is used for ingesting metrics, logs, and OpenTelemetry traces from pods
-   * outside the Dynatrace namespace.
-   * It is only applicable if you are using advanced deployment options (APPLICATION/FULL_STACK).
-   * Ensure that the following scopes are enabled for your data ingest token:
-   *
-   * - _Ingest metrics_
-   * - _Ingest logs_
-   * - _Ingest OpenTelemetry traces_
-   *
-   * To create a data ingest token, use the _Access Tokens_ page in the Dynatrace UI.
-   */
-  readonly dataIngestToken?: string;
-}
-
-/**
- * CPU resource configuration for Dynatrace monitoring.
- *
- * For valid values and units of measurement, refer to the corresponding
- * [Memory resource units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
- * documentation.
- */
-export interface DynatraceCpuResources {
-
-  /**
-   * CPU limit value.
-   */
-  readonly limit?: Cpu | string | number;
-
-  /**
-   * CPU request value.
-   */
-  readonly request?: Cpu | string | number;
-}
-
-/**
- * Memory resource configuration.
- *
- * For valid values and units of measurement, refer to the corresponding
- * [Memory resource units](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory)
- * documentation.
- */
-export interface DynatraceMemoryResources {
-
-  /**
-   * Memory limit value.
-   */
-  readonly limit?: Size | string | number;
-
-  /**
-   * Memory request value.
-   */
-  readonly request?: Size | string | number;
-}
-
-/**
- * CPU and memory resource configuration for the Dynatrace container.
- *
- * These configurations are optional, but can be customized for your deployment needs.
- */
-export interface DynatraceContainerResources {
-
-  /**
-   * CPU configuration for the Dynatrace container.
-   */
-  readonly cpu?: DynatraceCpuResources;
-
-  /**
-   * Memory configuration for the Dynatrace container.
-   */
-  readonly memory?: DynatraceMemoryResources;
-}
-
-/**
- * Represents optional ActiveGate capabilities that can be enabled for Dynatrace monitoring.
- *
- * These capabilities enhance monitoring functionality by enabling specific ActiveGate features.
- *
- * Note that core capabilities like `kubernetes-monitoring` and `routing` are added automatically
- * by the construct based on the selected deployment option.
- */
-export enum DynatraceCapability {
-
-  /**
-   * Enables the Dynatrace API endpoint on ActiveGate, allowing Kubernetes pods to interact with the Dynatrace API.
-   *
-   * This is required for scenarios where agents or services within the cluster need to push
-   * or query data via the Dynatrace API through the ActiveGate.
-   */
-  DYNATRACE_API = 'dynatrace-api',
-
-  /**
-   * Enables the metrics ingest endpoint on ActiveGate and configures pods to redirect metrics to it.
-   *
-   * This capability is required for collecting Prometheus metrics or custom metrics from pods
-   * outside the Dynatrace namespace.
-   */
-  METRICS_INGEST = 'metrics-ingest',
-}
-
-/**
- * Properties related to ActiveGate configuration in Dynatrace.
- */
-export interface ActiveGateProps {
-
-  /**
-   * Optional list of additional ActiveGate capabilities to enable.
-   *
-   * These capabilities extend the functionality of the ActiveGate component.
-   * The construct automatically includes essential capabilities like `kubernetes-monitoring`
-   * and `routing` based on the selected deployment option, so they do not need to be specified here.
-   *
-   * Use this property to explicitly enable additional features such as `metrics-ingest` or `dynatrace-api`.
-   */
-  capabilities?: DynatraceCapability[];
-
-  /**
-   * CPU and memory resource configurations for the ActiveGate pod(s).
-   *
-   * Resource limits and requests help control how much compute and memory is allocated to ActiveGate.
-   * Adjust these values based on your expected load and cluster resource availability.
-   *
-   * @default Uses predefined default values suitable for most workloads.
-   */
-  resources?: DynatraceContainerResources;
-}
-
-/**
- * Properties related to OneAgent configuration in Dynatrace.
- */
-export interface OneAgentProps {
-
-  /**
-   * CPU and memory resource configurations for the OneAgent pod(s).
-   *
-   * Resource limits and requests help control how much compute and memory is allocated to OneAgent.
-   * Adjust these values based on your expected load and cluster resource availability.
-   *
-   * @default Uses predefined default values suitable for most workloads.
-   */
-  resources?: DynatraceContainerResources;
-}
-
-/**
- * Specifies the deployment and observability options.
- *
- * The options have different capabilities, licensing, pricing, etc.
- *
- * For more information, see the Dynatrace documentation:
- * [Observability options](https://docs.dynatrace.com/docs/ingest-from/setup-on-k8s/deployment#observability-options)
- */
-export enum DeploymentOption {
-
-  /**
-   * Kubernetes platform monitoring.
-   */
-  PLATFORM = 'platform',
-
-  /**
-   * Kubernetes platform monitoring + Application observability.
-   */
-  APPLICATION = 'application',
-
-  /**
-   * Kubernetes platform monitoring + Full-stack observability.
-   */
-  FULL_STACK = 'full-stack',
-}
-
-/**
- * Configuration options for setting up Dynatrace monitoring on Kubernetes.
- */
-export interface DynatraceMonitoringProps {
-
-  /**
-   * Optional ActiveGate configuration.
-   */
-  readonly activeGate?: ActiveGateProps;
-
-  /**
-   * Dynatrace API endpoint URL.
-   */
-  readonly apiUrl: string;
-
-  /**
-   * Deployment mode for Dynatrace monitoring.
-   */
-  readonly deploymentOption: DeploymentOption;
-
-  /**
-   * Optional host group name to assign to monitored hosts.
-   *
-   * Host groups are used in Dynatrace to logically group and manage hosts for easier configuration and monitoring.
-   * This is especially useful for applying targeted settings, such as naming rules, management zones, etc.
-   *
-   * If specified, the value will be passed to the Dynatrace operator to tag the hosts accordingly.
-   *
-   * For more details, refer to the Dynatrace documentation:
-   * [Organize your environment using host groups](https://docs.dynatrace.com/docs/observe/infrastructure-monitoring/hosts/configuration/organize-your-environment-using-host-groups)
-   *
-   * @default undefined
-   */
-  readonly hostGroup?: string;
-
-  /**
-   * The name of the Kubernetes namespace the Dynatrace resources to deploy to.
-   *
-   * @default 'dynatrace'
-   */
-  readonly namespaceName?: string;
-
-  /**
-   * Additional metadata properties for the Kubernetes namespace.
-   *
-   * Ignored if `skipNamespaceCreation` is true.
-   */
-  readonly namespaceProps?: MetadataProps;
-
-  /**
-   * Optional resource settings for OneAgent in full-stack mode.
-   */
-  readonly oneAgent?: OneAgentProps;
-
-  /**
-   * Whether to skip SSL certificate validation for the Dynatrace API endpoint.
-   *
-   * This can be useful for testing or when using self-signed certificates, but is not recommended in production
-   * environments due to security concerns.
-   *
-   * @default false
-   */
-  readonly skipCertCheck?: boolean;
-
-  /**
-   * Whether to skip the creation of the Kubernetes namespace.
-   *
-   * If true, `namespaceProps` will not be used as the namespace name and assuming that the namespace already exists.
-   *
-   * @default false
-   */
-  readonly skipNamespaceCreation?: boolean;
-
-  /**
-   * Dynatrace access tokens for authentication.
-   */
-  readonly tokens: DynatraceTokens;
-}
 
 /**
  * CDK8s construct for deploying Dynatrace monitoring to a Kubernetes cluster.
@@ -442,11 +155,11 @@ export class DynatraceMonitoring extends Construct {
       },
       spec: {
         activeGate: {
-          capabilities: Array.from(new Set([
+          capabilities: sortKeysRecursive(Array.from(new Set([
             'kubernetes-monitoring',
             ...(this.isAdvancedDeployment() && ['routing'] || []),
             ...(this.props.activeGate?.capabilities?.map(enumValue => enumValue.toString()) || []),
-          ])),
+          ]))),
           resources: {
             requests: {
               ...this.parseResourceRequest('cpu', activeGateCpu?.request, DEFAULT_ACTIVE_GATE_CPU_REQUEST),
@@ -457,13 +170,13 @@ export class DynatraceMonitoring extends Construct {
               ...this.parseResourceRequest('memory', activeGateMemory?.limit, DEFAULT_ACTIVE_GATE_MEMORY_LIMIT),
             },
           },
-          tolerations: [
-            {
-              key: 'node-role.kubernetes.io/master',
-              operator: 'Exists',
-              effect: 'NoSchedule',
-            },
-          ],
+          //tolerations: [
+          //  {
+          //    key: 'node-role.kubernetes.io/master',
+          //    operator: 'Exists',
+          //    effect: 'NoSchedule',
+          //  },
+          //],
         },
         apiUrl: this.props.apiUrl,
         metadataEnrichment: {
@@ -479,12 +192,12 @@ export class DynatraceMonitoring extends Construct {
                 ...((oneAgentCpu || oneAgentMemory) && {
                   oneAgentResources: {
                     requests: {
-                      ...this.parseResourceRequest('cpu', oneAgentCpu?.request, DEFAULT_ONE_AGENT_CPU_REQUEST),
-                      ...this.parseResourceRequest('memory', oneAgentMemory?.request, DEFAULT_ONE_AGENT_MEMORY_REQUEST),
+                      ...this.parseResourceRequest('cpu', oneAgentCpu?.request),
+                      ...this.parseResourceRequest('memory', oneAgentMemory?.request),
                     },
                     limits: {
-                      ...this.parseResourceRequest('cpu', oneAgentCpu?.limit, DEFAULT_ONE_AGENT_CPU_LIMIT),
-                      ...this.parseResourceRequest('memory', oneAgentMemory?.limit, DEFAULT_ONE_AGENT_MEMORY_LIMIT),
+                      ...this.parseResourceRequest('cpu', oneAgentCpu?.limit),
+                      ...this.parseResourceRequest('memory', oneAgentMemory?.limit),
                     },
                   },
                 }),
@@ -534,7 +247,7 @@ export class DynatraceMonitoring extends Construct {
    * @param defaultValue Optional default value used when the value is undefined.
    * @returns An object with the parsed resource request for the given key.
    */
-  private parseResourceRequest(key: string, value: Cpu | Size | string | number | undefined, defaultValue?: string): Record<string, DynaKubeV1Beta3SpecActiveGateResourcesRequests> {
+  private parseResourceRequest(key: string, value?: Cpu | Size | string | number, defaultValue?: string): Record<string, DynaKubeV1Beta3SpecActiveGateResourcesRequests> {
     let outputValue: DynaKubeV1Beta3SpecActiveGateResourcesRequests | undefined = undefined;
 
     // The actual parsing of the primitive types is done by the imported class of the Dynatrace operator
