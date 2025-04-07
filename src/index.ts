@@ -6,5 +6,6 @@ export * from './dynatrace-monitoring';
 export * from './dynatrace-monitoring-props';
 export * from './memory-resources';
 export * from './metadata-props';
+export * from './namespace-props';
 export * from './one-agent-props';
 export * from './tokens';

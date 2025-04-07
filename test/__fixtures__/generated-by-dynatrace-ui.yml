@@ -29,7 +29,7 @@ spec: { }
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kubernetes-cluster-id-in-dynatrace
+  name: kubernetes-cluster-in-dynatrace
   namespace: dynatrace
 immutable: false
 stringData:
@@ -42,7 +42,7 @@ type: Opaque
 apiVersion: dynatrace.com/v1beta3
 kind: DynaKube
 metadata:
-  name: kubernetes-cluster-id-in-dynatrace
+  name: kubernetes-cluster-in-dynatrace
   namespace: dynatrace
   annotations:
     feature.dynatrace.com/injection-readonly-volume: 'true'

@@ -11,7 +11,7 @@ spec: { }
 apiVersion: v1
 kind: Secret
 metadata:
-  name: dynakube
+  name: kubernetes-cluster
   namespace: dynatrace
 immutable: false
 stringData:
@@ -29,7 +29,7 @@ type: Opaque
 apiVersion: dynatrace.com/v1beta3
 kind: DynaKube
 metadata:
-  name: dynakube
+  name: kubernetes-cluster
   namespace: dynatrace
   annotations:
     feature.dynatrace.com/k8s-app-enabled: "true"

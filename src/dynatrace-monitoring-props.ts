@@ -1,8 +1,8 @@
 import { ActiveGateProps } from './active-gate-props';
 import { DeploymentOption } from './deployment-option';
-import { MetadataProps } from './metadata-props';
 import { OneAgentProps } from './one-agent-props';
 import { Tokens } from './tokens';
+import { NamespaceProps } from './namespace-props';
 
 /**
  * Configuration options for setting up Dynatrace monitoring on Kubernetes.
@@ -40,18 +40,19 @@ export interface DynatraceMonitoringProps {
   readonly hostGroup?: string;
 
   /**
-   * The name of the Kubernetes namespace the Dynatrace resources to deploy to.
+   * The name of the Kubernetes cluster in Dynatrace.
    *
-   * @default 'dynatrace'
+   * This is used to identify the cluster in the Dynatrace UI. It means also that the DynaKube and Secret resources
+   * will be created with this name.
+   *
+   * @default 'kubernetes-cluster'
    */
-  readonly namespaceName?: string;
+  readonly name?: string;
 
   /**
-   * Additional metadata properties for the Kubernetes namespace.
-   *
-   * Ignored if `skipNamespaceCreation` is true.
+   * Optional namespace properties.
    */
-  readonly namespaceProps?: MetadataProps;
+  readonly namespace?: NamespaceProps;
 
   /**
    * Optional resource settings for OneAgent in full-stack mode.
@@ -67,15 +68,6 @@ export interface DynatraceMonitoringProps {
    * @default false
    */
   readonly skipCertCheck?: boolean;
-
-  /**
-   * Whether to skip the creation of the Kubernetes namespace.
-   *
-   * If true, `namespaceProps` will not be used as the namespace name and assuming that the namespace already exists.
-   *
-   * @default false
-   */
-  readonly skipNamespaceCreation?: boolean;
 
   /**
    * Dynatrace access tokens for authentication.

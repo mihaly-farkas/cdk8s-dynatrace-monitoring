@@ -272,12 +272,38 @@ describe('If the DynatraceMonitoring construct is configured with', () => {
       });
     });
   });
-  describe('.namespaceName', () => {
+  describe('.name', () => {
+    const names = [
+      'custom-name',
+    ];
+
+    describe.each(names)('(%s)', (name: string) => {
+      it('should generate a YAML with the specified name.', () => {
+        // Arrange
+        const app = Testing.app();
+        const chart = new Chart(app, 'test');
+
+        // Act
+        new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
+          ...defaultProps,
+          name,
+        });
+
+        // Generate the manifest as JSON
+        const manifest = Testing.synth(chart);
+
+        // Assert
+        expect(manifest[1].metadata.name).toBe(name); // Secret resource
+        expect(manifest[2].metadata.name).toBe(name); // DynaKube resource
+      });
+    });
+  });
+  describe('.namespace.name', () => {
     const namespaceNames = [
       'custom-namespace',
     ];
 
-    describe.each(namespaceNames)('(%s),', (namespaceName: string) => {
+    describe.each(namespaceNames)('(%s),', (name: string) => {
       it('should generate a YAML with the specified namespace.', () => {
         // Arrange
         const app = Testing.app();
@@ -286,16 +312,18 @@ describe('If the DynatraceMonitoring construct is configured with', () => {
         // Act
         new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
           ...defaultProps,
-          namespaceName,
+          namespace: {
+            name,
+          },
         });
 
         // Generate the manifest as JSON
         const manifest = Testing.synth(chart);
 
         // Assert
-        expect(manifest[0].metadata.name).toBe(namespaceName); // Namespace resource
-        expect(manifest[1].metadata.namespace).toBe(namespaceName); // Secret resource
-        expect(manifest[2].metadata.namespace).toBe(namespaceName); // DynaKube resource
+        expect(manifest[0].metadata.name).toBe(name); // Namespace resource
+        expect(manifest[1].metadata.namespace).toBe(name); // Secret resource
+        expect(manifest[2].metadata.namespace).toBe(name); // DynaKube resource
       });
 
       describe('and with .skipNamespaceCreation=true,', () => {
@@ -307,8 +335,10 @@ describe('If the DynatraceMonitoring construct is configured with', () => {
           // Act
           new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
             ...defaultProps,
-            namespaceName,
-            skipNamespaceCreation: true,
+            namespace: {
+              name,
+              skipNamespaceCreation: true,
+            },
           });
 
           // Generate the manifest as JSON
@@ -316,20 +346,20 @@ describe('If the DynatraceMonitoring construct is configured with', () => {
 
           // Assert
           expect(manifest).not.toHaveNamespaceDeclaration();
-          expect(manifest[0].metadata.namespace).toBe(namespaceName); // Secret resource
-          expect(manifest[1].metadata.namespace).toBe(namespaceName); // DynaKube resource
+          expect(manifest[0].metadata.namespace).toBe(name); // Secret resource
+          expect(manifest[1].metadata.namespace).toBe(name); // DynaKube resource
         });
       });
     });
   });
-  describe('.namespaceProps', () => {
-    const namespaceProps = [
+  describe('.namespace.metadata', () => {
+    const metadataSets = [
       {annotations: {'dummy/annotation': 'value'}},
       {labels: {'dummy/label': 'value'}},
     ];
 
-    describe.each(namespaceProps)('(%s)', (namespaceProps: any) => {
-      it('should generate a YAML with the specified namespace props in the namespace definition.', () => {
+    describe.each(metadataSets)('(%s)', (metadata: any) => {
+      it('should generate a YAML with the specified metadata in the namespace definition.', () => {
         // Arrange
         const app = Testing.app();
         const chart = new Chart(app, 'test');
@@ -337,15 +367,68 @@ describe('If the DynatraceMonitoring construct is configured with', () => {
         // Act
         new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
           ...defaultProps,
-          namespaceProps,
+          namespace: {
+            metadata,
+          },
         });
 
         // Generate the manifest as JSON
         const manifest = Testing.synth(chart);
 
         // Assert
-        expect(manifest[0].metadata).toMatchObject(namespaceProps);
+        expect(manifest[0].metadata).toMatchObject(metadata);
       });
+    });
+  });
+  describe('.namespace.skipNamespaceCreation', () => {
+    describe('(true),', () => {
+      it('should generate a YAML without the namespace.', () => {
+        // Arrange
+        const app = Testing.app();
+        const chart = new Chart(app, 'test');
+
+        // Act
+        new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
+          ...defaultProps,
+          namespace: {
+            skipNamespaceCreation: true,
+          },
+        });
+
+        // Generate the manifest as JSON
+        const manifest = Testing.synth(chart);
+
+        // Assert
+        expect(manifest).not.toHaveNamespaceDeclaration();
+      });
+
+      describe('and a .metadata specified,', () => {
+        it('should log a warning that metadata will be ignored.', () => {
+          // Parameters
+          const expectedWarningMessage =
+            'WARNING: Namespace creation is skipped. Custom namespace metadata will not be applied.';
+
+          // Arrange
+          const app = Testing.app();
+          const chart = new Chart(app, 'test');
+
+          const warn = jest.spyOn(console, 'warn').mockImplementation(() => {
+          });
+
+          // Act
+          new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
+            ...defaultProps,
+            namespace: {
+              skipNamespaceCreation: true,
+              metadata: {},
+            }
+          });
+
+          // Assert
+          expect(warn).toHaveBeenCalledWith(expectedWarningMessage);
+        });
+      });
+
     });
   });
   describe('.oneAgent.resources', () => {
@@ -553,53 +636,6 @@ describe('If the DynatraceMonitoring construct is configured with', () => {
     });
 
   });
-  describe('.skipNamespaceCreation', () => {
-    describe('(true),', () => {
-      it('should generate a YAML without the namespace.', () => {
-        // Arrange
-        const app = Testing.app();
-        const chart = new Chart(app, 'test');
-
-        // Act
-        new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
-          ...defaultProps,
-          skipNamespaceCreation: true,
-        });
-
-        // Generate the manifest as JSON
-        const manifest = Testing.synth(chart);
-
-        // Assert
-        expect(manifest).not.toHaveNamespaceDeclaration();
-      });
-
-      describe('and a .namespaceProps specified,', () => {
-        it('should log a warning that namespaceProps will be ignored.', () => {
-          // Parameters
-          const expectedWarningMessage =
-            'WARNING: Namespace creation is skipped. Custom namespace properties will not be applied.';
-
-          // Arrange
-          const app = Testing.app();
-          const chart = new Chart(app, 'test');
-
-          const warn = jest.spyOn(console, 'warn').mockImplementation(() => {
-          });
-
-          // Act
-          new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
-            ...defaultProps,
-            skipNamespaceCreation: true,
-            namespaceProps: {},
-          });
-
-          // Assert
-          expect(warn).toHaveBeenCalledWith(expectedWarningMessage);
-        });
-      });
-
-    });
-  });
   describe('.tokens.dataIngestToken', () => {
     const platformMonitoringTestCases = [
       ['*** DATA INGEST TOKEN ***', 'PLATFORM'],
@@ -672,19 +708,20 @@ describe('If the DynatraceMonitoring construct is configured with', () => {
 
         // Act
         new DynatraceMonitoring(chart, 'dynatrace-monitoring', {
-          deploymentOption: DeploymentOption.FULL_STACK,
-          apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
-          tokens: {
-            apiToken: '*** API TOKEN ***',
-            dataIngestToken: '*** DATA INGEST TOKEN ***',
-          },
-          hostGroup: 'dynatrace-group',
           activeGate: {
             capabilities: [
               Capability.DYNATRACE_API,
             ],
           },
+          apiUrl: 'https://ENVIRONMENTID.live.dynatrace.com/api',
+          deploymentOption: DeploymentOption.FULL_STACK,
+          hostGroup: 'dynatrace-group',
+          name: 'kubernetes-cluster-in-dynatrace',
           skipCertCheck: false,
+          tokens: {
+            apiToken: '*** API TOKEN ***',
+            dataIngestToken: '*** DATA INGEST TOKEN ***',
+          },
         });
 
         // Generate the manifest YAML

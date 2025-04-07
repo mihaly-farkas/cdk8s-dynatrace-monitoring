@@ -1,9 +1,7 @@
 /**
- * The default name for the DynaKube custom resource.
- *
- * DynaKube is the primary resource for configuring and managing Dynatrace monitoring on Kubernetes clusters.
+ * The default name of the Kubernetes cluster in Dynatrace.
  */
-export const DEFAULT_DYNA_KUBE_NAME = 'dynakube';
+export const DEFAULT_NAME = 'kubernetes-cluster';
 
 /**
  * The default CPU limit for the ActiveGate resource in Dynatrace monitoring.

@@ -4,14 +4,7 @@ import { Cpu, Namespace, Secret } from 'cdk8s-plus-32';
 import { DynaKubeV1Beta3, DynaKubeV1Beta3SpecActiveGateResourcesRequests } from 'cdk8s-imports/dynatrace.com';
 import { DeploymentOption } from './deployment-option';
 import { DynatraceMonitoringProps } from './dynatrace-monitoring-props';
-import {
-  DEFAULT_ACTIVE_GATE_CPU_LIMIT,
-  DEFAULT_ACTIVE_GATE_CPU_REQUEST,
-  DEFAULT_ACTIVE_GATE_MEMORY_LIMIT,
-  DEFAULT_ACTIVE_GATE_MEMORY_REQUEST,
-  DEFAULT_DYNA_KUBE_NAME,
-  DEFAULT_NAMESPACE,
-} from './constants';
+import { DEFAULT_ACTIVE_GATE_CPU_LIMIT, DEFAULT_ACTIVE_GATE_CPU_REQUEST, DEFAULT_ACTIVE_GATE_MEMORY_LIMIT, DEFAULT_ACTIVE_GATE_MEMORY_REQUEST, DEFAULT_NAME, DEFAULT_NAMESPACE } from './constants';
 import sortKeysRecursive from 'sort-keys-recursive';
 
 
@@ -64,10 +57,10 @@ export class DynatraceMonitoring extends Construct {
 
     this.props = props;
 
-    if (!props.skipNamespaceCreation) {
+    if (!props.namespace?.skipNamespaceCreation) {
       this.namespace = this.createNamespace();
-    } else if (props.namespaceProps) {
-      console.warn('WARNING: Namespace creation is skipped. Custom namespace properties will not be applied.');
+    } else if (props.namespace?.metadata) {
+      console.warn('WARNING: Namespace creation is skipped. Custom namespace metadata will not be applied.');
     }
 
     this.secret = this.createSecret();
@@ -78,7 +71,7 @@ export class DynatraceMonitoring extends Construct {
    * The name of the Kubernetes namespace.
    */
   public get namespaceName(): string {
-    return this.props.namespaceName ?? DEFAULT_NAMESPACE;
+    return this.props.namespace?.name ?? DEFAULT_NAMESPACE;
   }
 
   /**
@@ -90,7 +83,7 @@ export class DynatraceMonitoring extends Construct {
     return new Namespace(this, 'Namespace', {
       metadata: {
         name: this.namespaceName,
-        ...this.props.namespaceProps,
+        ...this.props.namespace?.metadata,
       },
     });
   }
@@ -230,7 +223,7 @@ export class DynatraceMonitoring extends Construct {
    */
   private getNameAndNamespaceMetadata(): { name: string; namespace?: string } {
     return {
-      name: DEFAULT_DYNA_KUBE_NAME,
+      name: this.props.name ?? DEFAULT_NAME,
       namespace: this.namespaceName,
     };
   }
