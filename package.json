@@ -9,7 +9,7 @@
     "kubernetes",
     "observability"
   ],
-  "version": "0.1.0-alpha.19",
+  "version": "0.1.0-alpha.20",
   "repository": {
     "type": "git",
     "url": "https://github.com/mihaly-farkas/cdk8s-dynatrace-monitoring.git"
@@ -51,7 +51,7 @@
     "constructs": "^10.4.2"
   },
   "dependencies": {
-    "cdk8s": "^2.69.60",
+    "cdk8s": "^2.70.3",
     "cdk8s-imports": "./imports",
     "js-yaml": "^4.1.0",
     "sort-keys-recursive": "^2.1.10"
@@ -61,20 +61,20 @@
     "@types/jest": "^29.5.14",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22",
-    "cdk8s-cli": "^2.200.32",
+    "cdk8s-cli": "^2.200.144",
     "cdk8s-plus-32": "2.0.9",
     "constructs": "10.4.2",
     "jest": "^29",
     "jest-file-snapshot": "^0.7.0",
     "jest-junit": "^16.0.0",
-    "jsii": "^5.8.3",
-    "jsii-pacmak": "^1.111.0",
-    "npm-check-updates": "^17.1.16",
+    "jsii": "^5.8.16",
+    "jsii-pacmak": "^1.112.0",
+    "npm-check-updates": "^17.1.18",
     "rimraf": "^6.0.1",
     "ts-jest": "^29",
     "ts-node": "^10",
-    "typedoc": "^0.28.1",
-    "typescript": "^5.8.2"
+    "typedoc": "^0.28.8",
+    "typescript": "^5.8.3"
   },
   "jsii": {
     "outdir": "dist",
